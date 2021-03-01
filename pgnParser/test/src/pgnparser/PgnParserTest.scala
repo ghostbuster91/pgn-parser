@@ -4,6 +4,8 @@ import cats.syntax.all._
 import utest._
 import com.softwaremill.diffx.generic.auto._
 import com.softwaremill.diffx.utest.DiffxAssertions._
+import Move.PromotionCapture
+import cats.data.Op
 
 object PgnParserTest extends TestSuite {
   val whitespace: P[Unit] = P.charIn(" \t\r\n").void
@@ -31,10 +33,25 @@ object PgnParserTest extends TestSuite {
   val checkmate = P.char('#').as[Check](Check.Checkmate)
   val checkRule = (check.orElse(checkmate)).?.map(_.getOrElse(Check.NoCheck))
   val capture = P.char('x').as(true).?.map(_.getOrElse(false))
-  val move =
+  val simpleMove =
     (figure.?, capture, position, checkRule).tupled.map {
-      case (f, capture, pos, check) => Move.SimpleMove(f, pos, capture, check)
+      case (f, capture, pos, check) =>
+        Move.SimpleMove(f, pos, capture, check): Move
     }
+  val promotionCapture =
+    (column <* P.char('x')).map(PromotionCapture(_))
+  val promotion =
+    (
+      (promotionCapture.map(Some(_)) ~ position).backtrack.orElse(
+        position.map(a => Option.empty[PromotionCapture] -> a)
+      ),
+      P.char('=') *> figure,
+      checkRule
+    ).tupled
+      .map { case ((capture, pos), f, check) =>
+        Move.Promotion(pos, f, capture, check): Move
+      }
+  val move = promotion.backtrack.orElse(simpleMove)
   val round =
     (
       roundNumber <* P.char('.'),
@@ -181,6 +198,82 @@ object PgnParserTest extends TestSuite {
         )
       )
     }
+    "parse round - promotion move" - {
+      val input = "19. a1=Q"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            19,
+            Move.Promotion(
+              Position('a', '1'),
+              Figure.Queen,
+              None,
+              Check.NoCheck
+            ),
+            None
+          )
+        )
+      )
+    }
+    "parse round - capture and check" - {
+      val input = "9. Bxc6+"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            9,
+            Move.SimpleMove(
+              Some(Figure.Bishop),
+              Position('c', '6'),
+              true,
+              Check.SimpleCheck
+            ),
+            None
+          )
+        )
+      )
+    }
+    "parse round - promotion move with check" - {
+      val input = "19. a1=Q+"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            19,
+            Move.Promotion(
+              Position('a', '1'),
+              Figure.Queen,
+              None,
+              Check.SimpleCheck
+            ),
+            None
+          )
+        )
+      )
+    }
+    "parse round - promotion move with capture" - {
+      val input = "19. axb8=Q"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            19,
+            Move.Promotion(
+              Position('b', '8'),
+              Figure.Queen,
+              Some(PromotionCapture('a')),
+              Check.NoCheck
+            ),
+            None
+          )
+        )
+      )
+    }
   }
 }
 
@@ -188,7 +281,6 @@ case class PgnGame(moves: List[Round])
 case class Round(number: Int, firstMove: Move, secondMove: Option[Move])
 sealed trait Move {
   def check: Check
-  def isCapture: Boolean
 }
 
 sealed trait Check
@@ -207,11 +299,13 @@ object Move {
   ) extends Move
 
   case class Promotion(
-      destitnation: Position,
+      target: Position,
       figure: Figure,
-      isCapture: Boolean,
+      capture: Option[PromotionCapture],
       check: Check
   ) extends Move
+
+  case class PromotionCapture(sourceRow: Char)
 }
 
 case class Position(row: Char, column: Char)

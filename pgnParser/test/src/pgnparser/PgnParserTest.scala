@@ -3,13 +3,16 @@ import cats.parse.{Parser => P, _}
 import cats.syntax.all._
 import utest._
 import com.softwaremill.diffx.generic.auto._
+import com.softwaremill.diffx.ConsoleColorConfig
 import com.softwaremill.diffx.utest.DiffxAssertions._
 import Move.PromotionCapture
 import cats.data.Op
 
 object PgnParserTest extends TestSuite {
-  val whitespace: P[Unit] = P.charIn(" \t\r\n").void
-  val spaceChar: P[Unit] = P.char(' ')
+  implicit val c: ConsoleColorConfig =
+    ConsoleColorConfig(x => s"-$x", x => s"+$x", identity, identity)
+  val whitespace = P.charIn(" \t\n").void
+  val spaceChar = P.char(' ')
   def parened[T](p: P[T]) = p.between(P.char('['), P.char(']'))
   def quotes[T](p: P[T]) = p.between(P.char('"'), P.char('"'))
   val string = P.charsWhile(c => c >= ' ' && c != '"' && c != '\\')
@@ -34,31 +37,29 @@ object PgnParserTest extends TestSuite {
   val checkRule = (check.orElse(checkmate)).?.map(_.getOrElse(Check.NoCheck))
   val capture = P.char('x').as(true).?.map(_.getOrElse(false))
   val simpleMove =
-    (figure.?, capture, position, checkRule).tupled.map {
-      case (f, capture, pos, check) =>
+    (figure.?.with1 ~ (capture.with1 ~ (position ~ checkRule))).map {
+      case (f, (capture, (pos, check))) =>
         Move.SimpleMove(f, pos, capture, check): Move
     }
   val promotionCapture =
     (column <* P.char('x')).map(PromotionCapture(_))
   val promotion =
     (
-      (promotionCapture.map(Some(_)) ~ position).backtrack.orElse(
+      (promotionCapture.map(Some(_)) ~ position).backtrack.orElse1(
         position.map(a => Option.empty[PromotionCapture] -> a)
       ),
-      P.char('=') *> figure,
-      checkRule
+      (P.char('=') *> figure) ~ checkRule
     ).tupled
-      .map { case ((capture, pos), f, check) =>
+      .map { case ((capture, pos), (f, check)) =>
         Move.Promotion(pos, f, capture, check): Move
       }
-  val move = promotion.backtrack.orElse(simpleMove)
+  val move = promotion.backtrack.orElse1(simpleMove)
   val round =
     (
       roundNumber <* P.char('.'),
-      (whitespace *> move),
-      (whitespace *> move).?
+      (whitespace *> move) ~ (whitespace *> move).?
     ).tupled
-      .map { case (round, move1, move2) =>
+      .map { case (round, (move1, move2)) =>
         Round(
           round,
           move1,
@@ -67,9 +68,14 @@ object PgnParserTest extends TestSuite {
       }
   val score =
     P.string("0-1")
-      .as(Score.BlackWins)
-      .orElse(P.string("1-0").backtrack.as(Score.WhiteWins))
-      .orElse(P.string("1/2-/1/2").as(Score.Draw))
+      .as(Score.BlackWins: Score)
+      .orElse(P.string("1-0").as(Score.WhiteWins: Score))
+      .orElse(P.string("1/2-1/2").as(Score.Draw: Score))
+
+  val rounds =
+    (round <* whitespace).backtrack.rep
+
+  val roundsWithScore = rounds ~ score
 
   val tests = Tests {
     "parse event property" - {
@@ -295,6 +301,101 @@ object PgnParserTest extends TestSuite {
             ),
             None
           )
+        )
+      )
+    }
+    "parse score" - {
+      assertEqual(score.parse("1-0"), Right("" -> Score.WhiteWins))
+      assertEqual(score.parse("0-1"), Right("" -> Score.BlackWins))
+      assertEqual(score.parse("1/2-1/2"), Right("" -> Score.Draw))
+    }
+    "parse multiple rounds" - {
+      val input = "1. d4 d5 2. f4 e6 3. Nf4 g6 "
+      val output = rounds.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> List(
+            Round(
+              1,
+              Move.SimpleMove(
+                None,
+                Position('d', '4'),
+                false,
+                Check.NoCheck
+              ),
+              Some(
+                Move.SimpleMove(
+                  None,
+                  Position('d', '5'),
+                  false,
+                  Check.NoCheck
+                )
+              )
+            ),
+            Round(
+              2,
+              Move.SimpleMove(
+                None,
+                Position('f', '4'),
+                false,
+                Check.NoCheck
+              ),
+              Some(
+                Move.SimpleMove(
+                  None,
+                  Position('e', '6'),
+                  false,
+                  Check.NoCheck
+                )
+              )
+            ),
+            Round(
+              3,
+              Move.SimpleMove(
+                Some(Figure.Knight),
+                Position('f', '4'),
+                false,
+                Check.NoCheck
+              ),
+              Some(
+                Move.SimpleMove(
+                  None,
+                  Position('g', '6'),
+                  false,
+                  Check.NoCheck
+                )
+              )
+            )
+          )
+        )
+      )
+    }
+    "parse rounds ended with score" - {
+      val input = "1. d4 d5 1/2-1/2"
+      val output = roundsWithScore.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> (List(
+            Round(
+              1,
+              Move.SimpleMove(
+                None,
+                Position('d', '4'),
+                false,
+                Check.NoCheck
+              ),
+              Some(
+                Move.SimpleMove(
+                  None,
+                  Position('d', '5'),
+                  false,
+                  Check.NoCheck
+                )
+              )
+            )
+          ) -> (Score.Draw: Score))
         )
       )
     }

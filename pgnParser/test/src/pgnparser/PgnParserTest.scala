@@ -65,6 +65,11 @@ object PgnParserTest extends TestSuite {
           move2
         )
       }
+  val score =
+    P.string("0-1")
+      .as(Score.BlackWins)
+      .orElse(P.string("1-0").backtrack.as(Score.WhiteWins))
+      .orElse(P.string("1/2-/1/2").as(Score.Draw))
 
   val tests = Tests {
     "parse event property" - {
@@ -274,6 +279,25 @@ object PgnParserTest extends TestSuite {
         )
       )
     }
+    "parse round - promotion move with capture and checkmate" - {
+      val input = "19. axb8=Q#"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            19,
+            Move.Promotion(
+              Position('b', '8'),
+              Figure.Queen,
+              Some(PromotionCapture('a')),
+              Check.Checkmate
+            ),
+            None
+          )
+        )
+      )
+    }
   }
 }
 
@@ -318,4 +342,11 @@ object Figure {
   case object Bishop extends Figure
   case object Knight extends Figure
   case object Rook extends Figure
+}
+
+sealed trait Score
+object Score {
+  case object WhiteWins extends Score
+  case object BlackWins extends Score
+  case object Draw extends Score
 }

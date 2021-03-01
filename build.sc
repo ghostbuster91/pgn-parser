@@ -7,7 +7,8 @@ object pgnParser extends ScalaModule with ScalafmtModule {
   object test extends Tests {
     def ivyDeps = Agg(
       ivy"com.lihaoyi::utest::0.7.7",
-      ivy"com.softwaremill.diffx::diffx-utest::0.4.3"
+      ivy"com.softwaremill.diffx::diffx-utest::0.4.3",
+      ivy"com.softwaremill.diffx::diffx-cats::0.4.3"
     )
     def testFrameworks = Seq("utest.runner.Framework")
   }

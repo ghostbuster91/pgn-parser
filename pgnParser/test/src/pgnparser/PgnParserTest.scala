@@ -1,14 +1,15 @@
 package pgnparser
+
 import cats.parse.{Parser => P, _}
 import cats.syntax.all._
 import utest._
-import com.softwaremill.diffx.generic.auto._
 import com.softwaremill.diffx.ConsoleColorConfig
 import com.softwaremill.diffx.utest.DiffxAssertions._
 import Move.PromotionCapture
-import cats.data.Op
+import com.softwaremill.diffx.cats._
 
-object PgnParserTest extends TestSuite {
+object PgnParserTest extends TestSuite with DiffSemiSupport {
+
   implicit val c: ConsoleColorConfig =
     ConsoleColorConfig(x => s"-$x", x => s"+$x", identity, identity)
   val whitespace = P.charIn(" \t\n").void
@@ -80,7 +81,23 @@ object PgnParserTest extends TestSuite {
   val tests = Tests {
     "parse event property" - {
       val input = """[Event "Rated Blitz game"]"""
-      assert(event.parse(input) == Right("" -> "Rated Blitz game"))
+      assertEqual(event.parse(input), Right("" -> "Rated Blitz game"))
+    }
+    "parse round - pawns moves only" - {
+      val input = "1. e4 e6"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            1,
+            Move.SimpleMove(None, Position('e', '4'), false, Check.NoCheck),
+            Some(
+              Move.SimpleMove(None, Position('e', '6'), false, Check.NoCheck)
+            )
+          )
+        )
+      )
     }
     "parse round - pawns moves only" - {
       val input = "1. e4 e6"
@@ -305,9 +322,9 @@ object PgnParserTest extends TestSuite {
       )
     }
     "parse score" - {
-      assertEqual(score.parse("1-0"), Right("" -> Score.WhiteWins))
-      assertEqual(score.parse("0-1"), Right("" -> Score.BlackWins))
-      assertEqual(score.parse("1/2-1/2"), Right("" -> Score.Draw))
+      assertEqual(score.parse("1-0"), Right("" -> (Score.WhiteWins: Score)))
+      assertEqual(score.parse("0-1"), Right("" -> (Score.BlackWins: Score)))
+      assertEqual(score.parse("1/2-1/2"), Right("" -> (Score.Draw: Score)))
     }
     "parse multiple rounds" - {
       val input = "1. d4 d5 2. f4 e6 3. Nf4 g6 "

@@ -16,8 +16,8 @@ object PgnParserTest extends TestSuite {
   )
   val event = property("Event")
   val column = P.charIn("abcdefgh")
-  val digit = P.charIn("12345678")
-  val row = digit
+  val digit = P.charIn("0123456789")
+  val row = P.charIn("12345678")
   val position = (column ~ row).map { case (c, r) => Position(c, r) }
   val roundNumber = digit.rep1.map(_.mkString_("").toInt)
   val figure = P.charIn("KQNBR").map {
@@ -29,10 +29,11 @@ object PgnParserTest extends TestSuite {
   }
   val check = P.char('+').as[Check](Check.SimpleCheck)
   val checkmate = P.char('#').as[Check](Check.Checkmate)
+  val checkRule = (check.orElse(checkmate)).?.map(_.getOrElse(Check.NoCheck))
+  val capture = P.char('x').as(true).?.map(_.getOrElse(false))
   val move =
-    (figure.?, position, (check.orElse(checkmate)).?).tupled.map {
-      case (f, pos, check) =>
-        Move.SimpleMove(f, pos, false, check.getOrElse(Check.NoCheck))
+    (figure.?, capture, position, checkRule).tupled.map {
+      case (f, capture, pos, check) => Move.SimpleMove(f, pos, capture, check)
     }
   val round =
     (
@@ -154,6 +155,25 @@ object PgnParserTest extends TestSuite {
               Some(Figure.Rook),
               Position('a', '6'),
               false,
+              Check.NoCheck
+            ),
+            None
+          )
+        )
+      )
+    }
+    "parse round - move with capture" - {
+      val input = "19. Bxf3"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            19,
+            Move.SimpleMove(
+              Some(Figure.Bishop),
+              Position('f', '3'),
+              true,
               Check.NoCheck
             ),
             None

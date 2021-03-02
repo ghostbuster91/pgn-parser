@@ -249,6 +249,70 @@ object PgnParserTest extends TestSuite {
         )
       )
     }
+    "parse round - king side castling" - {
+      val input = "19. O-O"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            19,
+            Move.KingSideCastle(
+              Check.NoCheck
+            ),
+            None
+          )
+        )
+      )
+    }
+    "parse round - king side castling with check" - {
+      val input = "19. O-O+"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            19,
+            Move.KingSideCastle(
+              Check.SimpleCheck
+            ),
+            None
+          )
+        )
+      )
+    }
+    "parse round - queen side castling" - {
+      val input = "19. O-O-O"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            19,
+            Move.QueenSideCastle(
+              Check.NoCheck
+            ),
+            None
+          )
+        )
+      )
+    }
+    "parse round - queen side castling with checkmate" - {
+      val input = "19. O-O-O#"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            19,
+            Move.QueenSideCastle(
+              Check.Checkmate
+            ),
+            None
+          )
+        )
+      )
+    }
     "parse round - promotion move with capture" - {
       val input = "19. axb8=Q"
       val output = round.parse(input)

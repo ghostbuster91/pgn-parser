@@ -69,11 +69,21 @@ object PgnParser {
       .map { case (((c, pos), f), check) =>
         Move.PawnCapture(pos, c, check, f): Move
       }
+  val kingSideCastle =
+    (P.string1("O-O") *> checkRule).map(check =>
+      Move.KingSideCastle(check): Move
+    )
+  val queenSideCastle = (P.string1("O-O-O") *> checkRule).map(check =>
+    Move.QueenSideCastle(check): Move
+  )
 
   val move = pawnMove.backtrack
     .orElse1(figureCapture.backtrack)
     .orElse1(pawnCapture.backtrack)
-    .orElse1(figureMove)
+    .orElse1(figureMove.backtrack)
+    .orElse1(queenSideCastle.backtrack)
+    .orElse1(kingSideCastle)
+
   val round =
     (
       roundNumber <* P.char('.'),
@@ -144,6 +154,8 @@ object Move {
       promotion: Option[Figure]
   ) extends Move
 
+  case class QueenSideCastle(check: Check) extends Move
+  case class KingSideCastle(check: Check) extends Move
 }
 
 case class Position(row: Char, column: Char)

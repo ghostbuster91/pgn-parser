@@ -17,7 +17,6 @@ object PgnParserTest extends TestSuite {
     "parse event property" - {
       val input = """[Event "Rated Blitz game"]"""
       val output = property.parse(input)
-      println(output)
       assertEqual(
         output,
         Right("" -> Meta("Event", "Rated Blitz game"))
@@ -31,9 +30,9 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             1,
-            Move.PawnMove(Position('e', '4'), Check.NoCheck),
+            Move.PawnMove(Position('e', '4'), Check.NoCheck, None),
             Some(
-              Move.PawnMove(Position('e', '6'), Check.NoCheck)
+              Move.PawnMove(Position('e', '6'), Check.NoCheck, None)
             )
           )
         )
@@ -55,7 +54,7 @@ object PgnParserTest extends TestSuite {
               None
             ),
             Some(
-              Move.PawnMove(Position('e', '6'), Check.NoCheck)
+              Move.PawnMove(Position('e', '6'), Check.NoCheck, None)
             )
           )
         )
@@ -76,7 +75,7 @@ object PgnParserTest extends TestSuite {
               None,
               Some('a')
             ),
-            Some(Move.PawnMove(Position('e', '6'), Check.NoCheck))
+            Some(Move.PawnMove(Position('e', '6'), Check.NoCheck, None))
           )
         )
       )
@@ -188,7 +187,8 @@ object PgnParserTest extends TestSuite {
             Move.PawnCapture(
               Position('f', '3'),
               'c',
-              Check.NoCheck
+              Check.NoCheck,
+              None
             ),
             None
           )
@@ -203,11 +203,10 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             19,
-            Move.Promotion(
+            Move.PawnMove(
               Position('a', '1'),
-              Figure.Queen,
-              None,
-              Check.NoCheck
+              Check.NoCheck,
+              Some(Figure.Queen)
             ),
             None
           )
@@ -242,11 +241,10 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             19,
-            Move.Promotion(
+            Move.PawnMove(
               Position('a', '1'),
-              Figure.Queen,
-              None,
-              Check.SimpleCheck
+              Check.SimpleCheck,
+              Some(Figure.Queen)
             ),
             None
           )
@@ -261,11 +259,11 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             19,
-            Move.Promotion(
+            Move.PawnCapture(
               Position('b', '8'),
-              Figure.Queen,
-              Some(Capture('a')),
-              Check.NoCheck
+              'a',
+              Check.NoCheck,
+              Some(Figure.Queen)
             ),
             None
           )
@@ -280,11 +278,11 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             19,
-            Move.Promotion(
+            Move.PawnCapture(
               Position('b', '8'),
-              Figure.Queen,
-              Some(Capture('a')),
-              Check.Checkmate
+              'a',
+              Check.Checkmate,
+              Some(Figure.Queen)
             ),
             None
           )
@@ -307,12 +305,14 @@ object PgnParserTest extends TestSuite {
               1,
               Move.PawnMove(
                 Position('d', '4'),
-                Check.NoCheck
+                Check.NoCheck,
+                None
               ),
               Some(
                 Move.PawnMove(
                   Position('d', '5'),
-                  Check.NoCheck
+                  Check.NoCheck,
+                  None
                 )
               )
             ),
@@ -320,12 +320,14 @@ object PgnParserTest extends TestSuite {
               2,
               Move.PawnMove(
                 Position('f', '4'),
-                Check.NoCheck
+                Check.NoCheck,
+                None
               ),
               Some(
                 Move.PawnMove(
                   Position('e', '6'),
-                  Check.NoCheck
+                  Check.NoCheck,
+                  None
                 )
               )
             ),
@@ -341,7 +343,8 @@ object PgnParserTest extends TestSuite {
               Some(
                 Move.PawnMove(
                   Position('g', '6'),
-                  Check.NoCheck
+                  Check.NoCheck,
+                  None
                 )
               )
             )
@@ -360,12 +363,14 @@ object PgnParserTest extends TestSuite {
               1,
               Move.PawnMove(
                 Position('d', '4'),
-                Check.NoCheck
+                Check.NoCheck,
+                None
               ),
               Some(
                 Move.PawnMove(
                   Position('d', '5'),
-                  Check.NoCheck
+                  Check.NoCheck,
+                  None
                 )
               )
             )
@@ -380,7 +385,11 @@ object PgnParserTest extends TestSuite {
         output,
         Right(
           "" -> (List(
-            Round(12, Move.PawnMove(Position('d', '4'), Check.NoCheck), None)
+            Round(
+              12,
+              Move.PawnMove(Position('d', '4'), Check.NoCheck, None),
+              None
+            )
           ) -> (Score.BlackWins: Score))
         )
       )

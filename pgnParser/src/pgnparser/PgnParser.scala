@@ -33,7 +33,7 @@ object PgnParser {
   val capture = P.char('x').as(true).?.map(_.getOrElse(false))
 
   val pawnMove = (position ~ checkRule).map { case (pos, check) =>
-    Move.PawnMove(pos, check): Move
+    Move.PawnMove(pos, check, None): Move
   }
   val sourceDest = position
     .map(p => SourceDest(None, None, p))
@@ -64,7 +64,7 @@ object PgnParser {
     }
   //cxd4
   val pawnCapture = ((column <* P.char('x')) ~ position ~ checkRule).map {
-    case ((c, pos), check) => Move.PawnCapture(pos, c, check): Move
+    case ((c, pos), check) => Move.PawnCapture(pos, c, check, None): Move
   }
   val promotionCapture =
     (column <* P.char('x')).map(Capture(_))
@@ -75,8 +75,11 @@ object PgnParser {
       ),
       (P.char('=') *> figure) ~ checkRule
     ).tupled
-      .map { case ((capture, pos), (f, check)) =>
-        Move.Promotion(pos, f, capture, check): Move
+      .map {
+        case ((Some(cap), pos), (f, check)) =>
+          Move.PawnCapture(pos, cap.sourceRow, check, Some(f))
+        case ((None, pos), (f, check)) =>
+          Move.PawnMove(pos, check, Some(f))
       }
   val move = promotion.backtrack.orElse1(
     pawnMove.backtrack.orElse1(
@@ -131,7 +134,8 @@ object Check {
 object Move {
   case class PawnMove(
       destitnation: Position,
-      check: Check
+      check: Check,
+      promotion: Option[Figure]
   ) extends Move
 
   case class FigureMove(
@@ -150,14 +154,11 @@ object Move {
       sourceCol: Option[Char]
   ) extends Move
 
-  case class PawnCapture(destitnation: Position, sourceRow: Char, check: Check)
-      extends Move
-
-  case class Promotion(
-      target: Position,
-      figure: Figure,
-      capture: Option[Capture],
-      check: Check
+  case class PawnCapture(
+      destitnation: Position,
+      sourceRow: Char,
+      check: Check,
+      promotion: Option[Figure]
   ) extends Move
 
   case class Capture(sourceRow: Char)

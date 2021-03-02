@@ -81,11 +81,11 @@ object PgnParser {
         case ((None, pos), (f, check)) =>
           Move.PawnMove(pos, check, Some(f))
       }
-  val move = promotion.backtrack.orElse1(
-    pawnMove.backtrack.orElse1(
-      figureCapture.backtrack.orElse1(pawnCapture.backtrack.orElse1(figureMove))
-    )
-  )
+  val move = promotion.backtrack
+    .orElse1(pawnMove.backtrack)
+    .orElse1(figureCapture.backtrack)
+    .orElse1(pawnCapture.backtrack)
+    .orElse1(figureMove)
   val round =
     (
       roundNumber <* P.char('.'),

@@ -114,6 +114,7 @@ object PgnParser {
       .as(Score.BlackWins: Score)
       .orElse(P.string("1-0").as(Score.WhiteWins: Score))
       .orElse(P.string("1/2-1/2").as(Score.Draw: Score))
+      .orElse(P.char('*').as(Score.Unfinished: Score))
 
   val rounds =
     (round <* whitespace).backtrack.rep
@@ -189,6 +190,7 @@ object Score {
   case object WhiteWins extends Score
   case object BlackWins extends Score
   case object Draw extends Score
+  case object Unfinished extends Score
 }
 case class Meta(key: String, value: String)
 case class PgnGame(meta: List[Meta], rounds: List[Round], score: Score)

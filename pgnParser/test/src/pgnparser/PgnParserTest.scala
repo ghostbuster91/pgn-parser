@@ -392,5 +392,26 @@ object PgnParserTest extends TestSuite {
       val output = pgnGame.parse(input)
       assert(output.isRight)
     }
+
+    "parse complete game with meta" - {
+      val input = """[Event "Rated Blitz game"]
+      |[Date "2021.02.28"]
+      |[Result "0-1"]
+      |[UTCDate "2021.02.28"]
+      |[UTCTime "15:35:29"]
+      |[WhiteElo "1676"]
+      |[BlackElo "1710"]
+      |[WhiteRatingDiff "-5"]
+      |[BlackRatingDiff "+6"]
+      |[Variant "Standard"]
+      |[TimeControl "300+2"]
+      |[ECO "B22"]
+      |[Termination "Normal"]
+
+      |1. e4 c5 2. c3 Nc6 3. Nf3 d6 1-0""".stripMargin
+
+      val output = pgnGame.parse(input)
+      assert(output.isRight)
+    }
   }
 }

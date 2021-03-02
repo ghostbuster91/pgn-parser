@@ -2,7 +2,6 @@ package pgnparser
 
 import cats.parse.{Parser => P, Parser1 => P1, _}
 import cats.syntax.all._
-import Move.Capture
 
 object PgnParser {
   val whitespace = P.charIn(" \t\n")
@@ -32,8 +31,10 @@ object PgnParser {
   val checkRule = (check.orElse(checkmate)).?.map(_.getOrElse(Check.NoCheck))
   val capture = P.char('x').as(true).?.map(_.getOrElse(false))
 
-  val pawnMove = (position ~ checkRule).map { case (pos, check) =>
-    Move.PawnMove(pos, check, None): Move
+  val pawnPromo = (P.char('=') *> figure).?
+  val pawnMove = (position ~ pawnPromo ~ checkRule).map {
+    case ((pos, f), check) =>
+      Move.PawnMove(pos, check, f): Move
   }
   val sourceDest = position
     .map(p => SourceDest(None, None, p))
@@ -63,26 +64,13 @@ object PgnParser {
         Move.FigureCapture(pos.position, f, check, pos.row, pos.row): Move
     }
   //cxd4
-  val pawnCapture = ((column <* P.char('x')) ~ position ~ checkRule).map {
-    case ((c, pos), check) => Move.PawnCapture(pos, c, check, None): Move
-  }
-  val promotionCapture =
-    (column <* P.char('x')).map(Capture(_))
-  val promotion =
-    (
-      (promotionCapture.map(Some(_)) ~ position).backtrack.orElse1(
-        position.map(a => Option.empty[Capture] -> a)
-      ),
-      (P.char('=') *> figure) ~ checkRule
-    ).tupled
-      .map {
-        case ((Some(cap), pos), (f, check)) =>
-          Move.PawnCapture(pos, cap.sourceRow, check, Some(f))
-        case ((None, pos), (f, check)) =>
-          Move.PawnMove(pos, check, Some(f))
+  val pawnCapture =
+    ((column <* P.char('x')) ~ position ~ pawnPromo ~ checkRule)
+      .map { case (((c, pos), f), check) =>
+        Move.PawnCapture(pos, c, check, f): Move
       }
-  val move = promotion.backtrack
-    .orElse1(pawnMove.backtrack)
+
+  val move = pawnMove.backtrack
     .orElse1(figureCapture.backtrack)
     .orElse1(pawnCapture.backtrack)
     .orElse1(figureMove)
@@ -156,7 +144,6 @@ object Move {
       promotion: Option[Figure]
   ) extends Move
 
-  case class Capture(sourceRow: Char)
 }
 
 case class Position(row: Char, column: Char)

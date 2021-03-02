@@ -5,7 +5,7 @@ import PgnParser._
 import com.softwaremill.diffx.generic.auto._
 import com.softwaremill.diffx.utest.DiffxAssertions._
 
-object MovesTest extends TestSuite {
+object MovesParsingTest extends TestSuite {
   val tests = Tests {
     "parse move - figure capture with column source" - {
       assertEqual(

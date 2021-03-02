@@ -51,6 +51,13 @@ object PgnParser {
       SourceDest(Some(p1.column), Some(p1.row), p2)
     })
 
+  val source = position.backtrack
+    .map(p =>
+      Source(Some(p.row), Some(p.column))
+    ) //TODO why inverted? this is weird
+    .orElse1(column.map(c => Source(Some(c), None)))
+    .orElse1(row.map(r => Source(None, Some(r))))
+
   //Nf3, Nbf3
   val figureMove = (figure ~ sourceDest ~ checkRule).map {
     case ((f, pos), check) =>
@@ -59,9 +66,15 @@ object PgnParser {
 
 //Bdxd4
   val figureCapture =
-    ((figure <* P.char('x')) ~ sourceDest ~ checkRule).map {
-      case ((f, pos), check) =>
-        Move.FigureCapture(pos.position, f, check, pos.row, pos.row): Move
+    ((figure ~ source.backtrack.? <* P.char('x')) ~ position ~ checkRule).map {
+      case (((f, src), pos), check) =>
+        Move.FigureCapture(
+          pos,
+          f,
+          check,
+          src.flatMap(_.row),
+          src.flatMap(_.col)
+        ): Move
     }
   //cxd4
   val pawnCapture =
@@ -106,11 +119,12 @@ object PgnParser {
     (round <* whitespace).backtrack.rep
 
   val pgnGame =
-    P.char('\n').? *> ((properties <* P.char('\n')).? ~ rounds ~ score).map {
-      case ((props, rounds), score) =>
+    P.char('\n').? *> ((properties <* P.char('\n')).? ~ rounds ~ score <* P.end)
+      .map { case ((props, rounds), score) =>
         PgnGame(props.getOrElse(List.empty), rounds, score)
-    }
+      }
 }
+case class Source(col: Option[Char], row: Option[Char])
 case class SourceDest(col: Option[Char], row: Option[Char], position: Position)
 case class Round(number: Int, firstMove: Move, secondMove: Option[Move])
 sealed trait Move {

@@ -352,9 +352,9 @@ object PgnParserTest extends TestSuite {
       )
     }
     "parse score" - {
-      assertEqual(score.parse("1-0"), Right("" -> Score.WhiteWins))
-      assertEqual(score.parse("0-1"), Right("" -> Score.BlackWins))
-      assertEqual(score.parse("1/2-1/2"), Right("" -> Score.Draw))
+      assertEqual(score.parse("1-0"), Right("" -> GameResult.WhiteWins))
+      assertEqual(score.parse("0-1"), Right("" -> GameResult.BlackWins))
+      assertEqual(score.parse("1/2-1/2"), Right("" -> GameResult.Draw))
     }
     "parse multiple rounds" - {
       val input = "1. d4 d5 2. f4 e6 3. Nf4 g6 "
@@ -436,7 +436,7 @@ object PgnParserTest extends TestSuite {
                 )
               )
             )
-          ) -> (Score.Draw: Score))
+          ) -> (GameResult.Draw: GameResult))
         )
       )
     }
@@ -452,7 +452,7 @@ object PgnParserTest extends TestSuite {
               Move.PawnMove(Position('d', '4'), Check.NoCheck, None),
               None
             )
-          ) -> (Score.BlackWins: Score))
+          ) -> (GameResult.BlackWins: GameResult))
         )
       )
     }

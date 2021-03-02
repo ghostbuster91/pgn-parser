@@ -111,10 +111,10 @@ object PgnParser {
       }
   val score =
     P.string("0-1")
-      .as(Score.BlackWins: Score)
-      .orElse(P.string("1-0").as(Score.WhiteWins: Score))
-      .orElse(P.string("1/2-1/2").as(Score.Draw: Score))
-      .orElse(P.char('*').as(Score.Unfinished: Score))
+      .as(GameResult.BlackWins: GameResult)
+      .orElse(P.string("1-0").as(GameResult.WhiteWins: GameResult))
+      .orElse(P.string("1/2-1/2").as(GameResult.Draw: GameResult))
+      .orElse(P.char('*').as(GameResult.Unfinished: GameResult))
 
   val rounds =
     (round <* whitespace).backtrack.rep
@@ -185,12 +185,12 @@ object Figure {
   case object Rook extends Figure
 }
 
-sealed trait Score
-object Score {
-  case object WhiteWins extends Score
-  case object BlackWins extends Score
-  case object Draw extends Score
-  case object Unfinished extends Score
+sealed trait GameResult
+object GameResult {
+  case object WhiteWins extends GameResult
+  case object BlackWins extends GameResult
+  case object Draw extends GameResult
+  case object Unfinished extends GameResult
 }
 case class Meta(key: String, value: String)
-case class PgnGame(meta: List[Meta], rounds: List[Round], score: Score)
+case class PgnGame(meta: List[Meta], rounds: List[Round], result: GameResult)

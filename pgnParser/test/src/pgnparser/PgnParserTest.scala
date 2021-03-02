@@ -5,7 +5,7 @@ import utest._
 import com.softwaremill.diffx.generic.auto._
 import com.softwaremill.diffx.ConsoleColorConfig
 import com.softwaremill.diffx.utest.DiffxAssertions._
-import Move.PromotionCapture
+import Move.Capture
 import cats.data.Op
 import PgnParser._
 
@@ -16,7 +16,12 @@ object PgnParserTest extends TestSuite {
   val tests = Tests {
     "parse event property" - {
       val input = """[Event "Rated Blitz game"]"""
-      assert(event.parse(input) == Right("" -> "Rated Blitz game"))
+      val output = property.parse(input)
+      println(output)
+      assertEqual(
+        output,
+        Right("" -> Meta("Event", "Rated Blitz game"))
+      )
     }
     "parse round - pawns moves only" - {
       val input = "1. e4 e6"
@@ -26,9 +31,9 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             1,
-            Move.SimpleMove(None, Position('e', '4'), false, Check.NoCheck),
+            Move.PawnMove(Position('e', '4'), Check.NoCheck),
             Some(
-              Move.SimpleMove(None, Position('e', '6'), false, Check.NoCheck)
+              Move.PawnMove(Position('e', '6'), Check.NoCheck)
             )
           )
         )
@@ -42,15 +47,36 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             1,
-            Move.SimpleMove(
-              Some(Figure.Knight),
+            Move.FigureMove(
+              Figure.Knight,
               Position('f', '3'),
-              false,
-              Check.NoCheck
+              Check.NoCheck,
+              None,
+              None
             ),
             Some(
-              Move.SimpleMove(None, Position('e', '6'), false, Check.NoCheck)
+              Move.PawnMove(Position('e', '6'), Check.NoCheck)
             )
+          )
+        )
+      )
+    }
+    "parse round - figure ambigious move" - {
+      val input = "1. Rac1 e6"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            1,
+            Move.FigureMove(
+              Figure.Rook,
+              Position('c', '1'),
+              Check.NoCheck,
+              None,
+              Some('a')
+            ),
+            Some(Move.PawnMove(Position('e', '6'), Check.NoCheck))
           )
         )
       )
@@ -63,18 +89,20 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             36,
-            Move.SimpleMove(
-              Some(Figure.Rook),
+            Move.FigureMove(
+              Figure.Rook,
               Position('a', '6'),
-              false,
-              Check.SimpleCheck
+              Check.SimpleCheck,
+              None,
+              None
             ),
             Some(
-              Move.SimpleMove(
-                Some(Figure.King),
+              Move.FigureMove(
+                Figure.King,
                 Position('c', '5'),
-                false,
-                Check.NoCheck
+                Check.NoCheck,
+                None,
+                None
               )
             )
           )
@@ -89,18 +117,20 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             36,
-            Move.SimpleMove(
-              Some(Figure.Rook),
+            Move.FigureMove(
+              Figure.Rook,
               Position('a', '6'),
-              false,
-              Check.NoCheck
+              Check.NoCheck,
+              None,
+              None
             ),
             Some(
-              Move.SimpleMove(
-                Some(Figure.King),
+              Move.FigureMove(
+                Figure.King,
                 Position('c', '5'),
-                false,
-                Check.Checkmate
+                Check.Checkmate,
+                None,
+                None
               )
             )
           )
@@ -115,11 +145,12 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             36,
-            Move.SimpleMove(
-              Some(Figure.Rook),
+            Move.FigureMove(
+              Figure.Rook,
               Position('a', '6'),
-              false,
-              Check.NoCheck
+              Check.NoCheck,
+              None,
+              None
             ),
             None
           )
@@ -134,10 +165,29 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             19,
-            Move.SimpleMove(
-              Some(Figure.Bishop),
+            Move.FigureCapture(
               Position('f', '3'),
-              true,
+              Figure.Bishop,
+              Check.NoCheck,
+              None,
+              None
+            ),
+            None
+          )
+        )
+      )
+    }
+    "parse round - move with capture by pawn" - {
+      val input = "19. cxf3"
+      val output = round.parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> Round(
+            19,
+            Move.PawnCapture(
+              Position('f', '3'),
+              'c',
               Check.NoCheck
             ),
             None
@@ -172,11 +222,12 @@ object PgnParserTest extends TestSuite {
         Right(
           "" -> Round(
             9,
-            Move.SimpleMove(
-              Some(Figure.Bishop),
+            Move.FigureCapture(
               Position('c', '6'),
-              true,
-              Check.SimpleCheck
+              Figure.Bishop,
+              Check.SimpleCheck,
+              None,
+              None
             ),
             None
           )
@@ -213,7 +264,7 @@ object PgnParserTest extends TestSuite {
             Move.Promotion(
               Position('b', '8'),
               Figure.Queen,
-              Some(PromotionCapture('a')),
+              Some(Capture('a')),
               Check.NoCheck
             ),
             None
@@ -232,7 +283,7 @@ object PgnParserTest extends TestSuite {
             Move.Promotion(
               Position('b', '8'),
               Figure.Queen,
-              Some(PromotionCapture('a')),
+              Some(Capture('a')),
               Check.Checkmate
             ),
             None
@@ -254,51 +305,42 @@ object PgnParserTest extends TestSuite {
           "" -> List(
             Round(
               1,
-              Move.SimpleMove(
-                None,
+              Move.PawnMove(
                 Position('d', '4'),
-                false,
                 Check.NoCheck
               ),
               Some(
-                Move.SimpleMove(
-                  None,
+                Move.PawnMove(
                   Position('d', '5'),
-                  false,
                   Check.NoCheck
                 )
               )
             ),
             Round(
               2,
-              Move.SimpleMove(
-                None,
+              Move.PawnMove(
                 Position('f', '4'),
-                false,
                 Check.NoCheck
               ),
               Some(
-                Move.SimpleMove(
-                  None,
+                Move.PawnMove(
                   Position('e', '6'),
-                  false,
                   Check.NoCheck
                 )
               )
             ),
             Round(
               3,
-              Move.SimpleMove(
-                Some(Figure.Knight),
+              Move.FigureMove(
+                Figure.Knight,
                 Position('f', '4'),
-                false,
-                Check.NoCheck
+                Check.NoCheck,
+                None,
+                None
               ),
               Some(
-                Move.SimpleMove(
-                  None,
+                Move.PawnMove(
                   Position('g', '6'),
-                  false,
                   Check.NoCheck
                 )
               )
@@ -309,24 +351,20 @@ object PgnParserTest extends TestSuite {
     }
     "parse rounds ended with score" - {
       val input = "1. d4 d5 1/2-1/2"
-      val output = roundsWithScore.parse(input)
+      val output = (rounds ~ score).parse(input)
       assertEqual(
         output,
         Right(
           "" -> (List(
             Round(
               1,
-              Move.SimpleMove(
-                None,
+              Move.PawnMove(
                 Position('d', '4'),
-                false,
                 Check.NoCheck
               ),
               Some(
-                Move.SimpleMove(
-                  None,
+                Move.PawnMove(
                   Position('d', '5'),
-                  false,
                   Check.NoCheck
                 )
               )
@@ -334,6 +372,25 @@ object PgnParserTest extends TestSuite {
           ) -> (Score.Draw: Score))
         )
       )
+    }
+    "parse round with single move followed by score" - {
+      val input = """12. d4 0-1"""
+      val output = (rounds ~ score).parse(input)
+      assertEqual(
+        output,
+        Right(
+          "" -> (List(
+            Round(12, Move.PawnMove(Position('d', '4'), Check.NoCheck), None)
+          ) -> (Score.BlackWins: Score))
+        )
+      )
+    }
+
+    "parse complete game" - {
+      val input =
+        """1. e4 c5 2. c3 Nc6 3. Nf3 d6 4. d4 cxd4 5. cxd4 g6 6. Bb5 Nf6 7. d5 Qa5+ 8. Nc3 Nxe4 9. Bxc6+ bxc6 10. Bd2 Nxd2 11. Qxd2 Bg7 12. dxc6 13. Bg4 14. Rfe1 e6 15. a3 Rfd8 16. b4 Qc7 17. Rac1 Qxc6 18. Qd3 Bf5 19. Qe3 Qd7 20. Nd4 Bxd4 21. Qxd4 e5 22. Qh4 Be6 23. Ne4 Kg7 24. Nf6 Qe7 25. Nh5+ Kf8 26. Qxe7+ Kxe7 27. Ng3 f5 28. Rc7+ Kf6 29. Rxh7 d5 30. h3 d4 31. Rc7 d3 32. Rd1 e4 33. Nf1 Rdc8 34. Rdc1 Rxc7 35. Rxc7 Rc8 36. Rxc8 Bxc8 37. Nd2 Be6 38. Kf1 g5 39. Ke1 Ke5 40. Kd1 Kd4 41. Kc1 Kc3 42. b5 Bd7 43. a4 Kb4 44. Nb1 Kxa4 45. Nc3+ Kb4 46. Kd2 Bxb5 47. Nd5+ Kc5 48. Ne3 Bd7 49. Nd1 a5 50. Nc3 Kd4 51. Nb1 a4 52. Na3 f4 53. Nb1 e3+ 54. fxe3+ fxe3+ 55. Ke1 d2+ 56. Nxd2 exd2+ 57. Kxd2 a3 58. Kc2 a2 59. Kb2 Be6 60. g4 Ke4 61. Kc3 Kf4 62. Kd2 Kg3 63. Ke3 a1=Q 0-1"""
+      val output = pgnGame.parse(input)
+      assert(output.isRight)
     }
   }
 }

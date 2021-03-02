@@ -1,19 +1,20 @@
 package pgnparser
 
-import cats.parse.{Parser => P, _}
+import cats.parse.{Parser => P, Parser1 => P1, _}
 import cats.syntax.all._
-import Move.PromotionCapture
+import Move.Capture
 
 object PgnParser {
-  val whitespace = P.charIn(" \t\n").void
-  val spaceChar = P.char(' ')
+  val whitespace = P.charIn(" \t\n")
   def parened[T](p: P[T]) = p.between(P.char('['), P.char(']'))
-  def quotes[T](p: P[T]) = p.between(P.char('"'), P.char('"'))
-  val string = P.charsWhile(c => c >= ' ' && c != '"' && c != '\\')
-  def property(p: String) = parened(
-    (P.string(p) *> spaceChar *> quotes(string))
-  )
-  val event = property("Event")
+  val quotedString =
+    P.char('"') *> P.charsWhile1(c => c != '"').map(_.mkString) <* P.char('"')
+  val string = P.charsWhile1(c => c != ' ').map(_.mkString)
+  val property = parened(
+    (string <* whitespace) ~ quotedString
+  ).map { case (k, v) => Meta(k, v) }
+  val properties =
+    (property.with1 <* P.char('\n')).backtrack.rep
   val column = P.charIn("abcdefgh")
   val digit = P.charIn("0123456789")
   val row = P.charIn("12345678")
@@ -30,28 +31,62 @@ object PgnParser {
   val checkmate = P.char('#').as[Check](Check.Checkmate)
   val checkRule = (check.orElse(checkmate)).?.map(_.getOrElse(Check.NoCheck))
   val capture = P.char('x').as(true).?.map(_.getOrElse(false))
-  val simpleMove =
-    (figure.?.with1 ~ (capture.with1 ~ (position ~ checkRule))).map {
-      case (f, (capture, (pos, check))) =>
-        Move.SimpleMove(f, pos, capture, check): Move
+
+  val pawnMove = (position ~ checkRule).map { case (pos, check) =>
+    Move.PawnMove(pos, check): Move
+  }
+  val sourceDest = position
+    .map(p => SourceDest(None, None, p))
+    .backtrack
+    .orElse1((column ~ position).map { case (c, p) =>
+      SourceDest(Some(c), None, p)
+    })
+    .backtrack
+    .orElse1((row ~ position).map { case (r, p) =>
+      SourceDest(None, Some(r), p)
+    })
+    .backtrack
+    .orElse1((position ~ position).map { case (p1, p2) =>
+      SourceDest(Some(p1.column), Some(p1.row), p2)
+    })
+
+  //Nf3, Nbf3
+  val figureMove = (figure ~ sourceDest ~ checkRule).map {
+    case ((f, pos), check) =>
+      Move.FigureMove(f, pos.position, check, pos.row, pos.col)
+  }
+
+//Bdxd4
+  val figureCapture =
+    ((figure <* P.char('x')) ~ sourceDest ~ checkRule).map {
+      case ((f, pos), check) =>
+        Move.FigureCapture(pos.position, f, check, pos.row, pos.row): Move
     }
+  //cxd4
+  val pawnCapture = ((column <* P.char('x')) ~ position ~ checkRule).map {
+    case ((c, pos), check) => Move.PawnCapture(pos, c, check): Move
+  }
   val promotionCapture =
-    (column <* P.char('x')).map(PromotionCapture(_))
+    (column <* P.char('x')).map(Capture(_))
   val promotion =
     (
       (promotionCapture.map(Some(_)) ~ position).backtrack.orElse1(
-        position.map(a => Option.empty[PromotionCapture] -> a)
+        position.map(a => Option.empty[Capture] -> a)
       ),
       (P.char('=') *> figure) ~ checkRule
     ).tupled
       .map { case ((capture, pos), (f, check)) =>
         Move.Promotion(pos, f, capture, check): Move
       }
-  val move = promotion.backtrack.orElse1(simpleMove)
+  val move = promotion.backtrack.orElse1(
+    pawnMove.backtrack.orElse1(
+      figureCapture.backtrack.orElse1(pawnCapture.backtrack.orElse1(figureMove))
+    )
+  )
   val round =
     (
       roundNumber <* P.char('.'),
-      (whitespace *> move) ~ (whitespace *> move).?
+      (whitespace *> move) ~ (whitespace *> move).backtrack.?
     ).tupled
       .map { case (round, (move1, move2)) =>
         Round(
@@ -63,17 +98,24 @@ object PgnParser {
   val score =
     P.string("0-1")
       .as(Score.BlackWins: Score)
-      .orElse(P.string("1-0").as(Score.WhiteWins: Score))
-      .orElse(P.string("1/2-1/2").as(Score.Draw: Score))
+      .backtrack
+      .orElse(
+        P.string("1-0")
+          .as(Score.WhiteWins: Score)
+          .backtrack
+          .orElse(P.string("1/2-1/2").as(Score.Draw: Score))
+      )
 
   val rounds =
     (round <* whitespace).backtrack.rep
 
-  val roundsWithScore = rounds ~ score
-
+  val pgnGame =
+    P.char('\n').? *> ((properties <* P.char('\n')).? ~ rounds ~ score).map {
+      case ((props, rounds), score) =>
+        PgnGame(props.getOrElse(List.empty), rounds, score)
+    }
 }
-
-case class PgnGame(moves: List[Round])
+case class SourceDest(col: Option[Char], row: Option[Char], position: Position)
 case class Round(number: Int, firstMove: Move, secondMove: Option[Move])
 sealed trait Move {
   def check: Check
@@ -87,21 +129,38 @@ object Check {
 }
 
 object Move {
-  case class SimpleMove(
-      figure: Option[Figure],
+  case class PawnMove(
       destitnation: Position,
-      isCapture: Boolean,
       check: Check
   ) extends Move
+
+  case class FigureMove(
+      figure: Figure,
+      destitnation: Position,
+      check: Check,
+      sourceRow: Option[Char],
+      sourceCol: Option[Char]
+  ) extends Move
+
+  case class FigureCapture(
+      destitnation: Position,
+      figure: Figure,
+      check: Check,
+      sourceRow: Option[Char],
+      sourceCol: Option[Char]
+  ) extends Move
+
+  case class PawnCapture(destitnation: Position, sourceRow: Char, check: Check)
+      extends Move
 
   case class Promotion(
       target: Position,
       figure: Figure,
-      capture: Option[PromotionCapture],
+      capture: Option[Capture],
       check: Check
   ) extends Move
 
-  case class PromotionCapture(sourceRow: Char)
+  case class Capture(sourceRow: Char)
 }
 
 case class Position(row: Char, column: Char)
@@ -122,3 +181,5 @@ object Score {
   case object BlackWins extends Score
   case object Draw extends Score
 }
+case class Meta(key: String, value: String)
+case class PgnGame(meta: List[Meta], rounds: List[Round], score: Score)

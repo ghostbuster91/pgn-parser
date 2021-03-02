@@ -101,13 +101,8 @@ object PgnParser {
   val score =
     P.string("0-1")
       .as(Score.BlackWins: Score)
-      .backtrack
-      .orElse(
-        P.string("1-0")
-          .as(Score.WhiteWins: Score)
-          .backtrack
-          .orElse(P.string("1/2-1/2").as(Score.Draw: Score))
-      )
+      .orElse(P.string("1-0").as(Score.WhiteWins: Score))
+      .orElse(P.string("1/2-1/2").as(Score.Draw: Score))
 
   val rounds =
     (round <* whitespace).backtrack.rep

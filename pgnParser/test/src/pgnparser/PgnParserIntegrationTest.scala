@@ -8,7 +8,7 @@ object PgnParserIntegrationTest extends TestSuite {
     val games: List[String] = loadGames
 
     "parse successfully 10k games" - {
-      games.zipWithIndex.map { case (pgnGame, idx) =>
+      games.zipWithIndex.foreach { case (pgnGame, idx) =>
         val res = PgnParser.pgnGame.parse(pgnGame)
         res match {
           case Left(value) =>

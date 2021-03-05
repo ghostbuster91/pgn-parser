@@ -15,7 +15,7 @@ object MovesParsingTest extends TestSuite with DiffSemiSupport {
       assertEqual(
         move.parse("Rexf2"),
         Right(
-          "" -> Move.FigureCapture(
+          "" -> SanMove.FigureCapture(
             Position('f', '2'),
             Figure.Rook,
             Check.NoCheck,
@@ -29,7 +29,7 @@ object MovesParsingTest extends TestSuite with DiffSemiSupport {
       assertEqual(
         move.parse("R1xf2"),
         Right(
-          "" -> Move.FigureCapture(
+          "" -> SanMove.FigureCapture(
             Position('f', '2'),
             Figure.Rook,
             Check.NoCheck,
@@ -43,7 +43,7 @@ object MovesParsingTest extends TestSuite with DiffSemiSupport {
       assertEqual(
         move.parse("Re1xf2"),
         Right(
-          "" -> Move.FigureCapture(
+          "" -> SanMove.FigureCapture(
             Position('f', '2'),
             Figure.Rook,
             Check.NoCheck,

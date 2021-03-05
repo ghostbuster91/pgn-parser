@@ -11,7 +11,7 @@ trait DiffSemiSupport {
   implicit val dFigure = Diff.derived[Figure]
   implicit val dExcep = Diff.derived[Expectation]
   implicit val dError = Diff.derived[Error]
-  implicit val dMove = Diff.derived[Move]
+  implicit val dMove = Diff.derived[SanMove]
   implicit val dRound = Diff.derived[Round]
   implicit val dResult = Diff.derived[GameResult]
   implicit val dMeta = Diff.derived[Meta]

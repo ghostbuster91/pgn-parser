@@ -34,7 +34,7 @@ object PgnParser {
   val pawnPromo = (P.char('=') *> figure).?
   val pawnMove = (position ~ pawnPromo ~ checkRule).map {
     case ((pos, f), check) =>
-      Move.PawnMove(pos, check, f): Move
+      SanMove.PawnMove(pos, check, f): SanMove
   }
   val sourceDest = position
     .map(p => SourceDest(None, None, p))
@@ -61,33 +61,33 @@ object PgnParser {
   //Nf3, Nbf3
   val figureMove = (figure ~ sourceDest ~ checkRule).map {
     case ((f, pos), check) =>
-      Move.FigureMove(f, pos.position, check, pos.row, pos.col)
+      SanMove.FigureMove(f, pos.position, check, pos.row, pos.col)
   }
 
 //Bdxd4
   val figureCapture =
     ((figure ~ source.backtrack.? <* P.char('x')) ~ position ~ checkRule).map {
       case (((f, src), pos), check) =>
-        Move.FigureCapture(
+        SanMove.FigureCapture(
           pos,
           f,
           check,
           src.flatMap(_.row),
           src.flatMap(_.col)
-        ): Move
+        ): SanMove
     }
   //cxd4
   val pawnCapture =
     ((column <* P.char('x')) ~ position ~ pawnPromo ~ checkRule)
       .map { case (((c, pos), f), check) =>
-        Move.PawnCapture(pos, c, check, f): Move
+        SanMove.PawnCapture(pos, c, check, f): SanMove
       }
   val kingSideCastle =
     (P.string1("O-O") *> checkRule).map(check =>
-      Move.KingSideCastle(check): Move
+      SanMove.KingSideCastle(check): SanMove
     )
   val queenSideCastle = (P.string1("O-O-O") *> checkRule).map(check =>
-    Move.QueenSideCastle(check): Move
+    SanMove.QueenSideCastle(check): SanMove
   )
 
   val move = pawnMove.backtrack
@@ -123,8 +123,8 @@ object PgnParser {
 }
 case class Source(col: Option[Char], row: Option[Char])
 case class SourceDest(col: Option[Char], row: Option[Char], position: Position)
-case class Round(number: Int, firstMove: Move, secondMove: Option[Move])
-sealed trait Move {
+case class Round(number: Int, firstMove: SanMove, secondMove: Option[SanMove])
+sealed trait SanMove {
   def check: Check
 }
 
@@ -135,12 +135,12 @@ object Check {
   case object Checkmate extends Check
 }
 
-object Move {
+object SanMove {
   case class PawnMove(
       destitnation: Position,
       check: Check,
       promotion: Option[Figure]
-  ) extends Move
+  ) extends SanMove
 
   case class FigureMove(
       figure: Figure,
@@ -148,7 +148,7 @@ object Move {
       check: Check,
       sourceRow: Option[Char],
       sourceCol: Option[Char]
-  ) extends Move
+  ) extends SanMove
 
   case class FigureCapture(
       destitnation: Position,
@@ -156,17 +156,17 @@ object Move {
       check: Check,
       sourceRow: Option[Char],
       sourceCol: Option[Char]
-  ) extends Move
+  ) extends SanMove
 
   case class PawnCapture(
       destitnation: Position,
       sourceRow: Char,
       check: Check,
       promotion: Option[Figure]
-  ) extends Move
+  ) extends SanMove
 
-  case class QueenSideCastle(check: Check) extends Move
-  case class KingSideCastle(check: Check) extends Move
+  case class QueenSideCastle(check: Check) extends SanMove
+  case class KingSideCastle(check: Check) extends SanMove
 }
 
 case class Position(row: Char, column: Char)

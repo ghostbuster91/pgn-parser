@@ -1,6 +1,7 @@
 package chesslib
 
 import utest._
+import chessmodel._
 
 object ChessLibTest extends TestSuite {
 

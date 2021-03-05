@@ -2,6 +2,7 @@ import mill._, scalalib._
 import mill.scalalib.scalafmt.ScalafmtModule
 
 object pgnParser extends ScalaModule with ScalafmtModule {
+  def moduleDeps = Seq(chessModel)
   def scalaVersion = "2.13.5"
   def ivyDeps = Agg(ivy"org.typelevel::cats-parse::0.2.0")
   object test extends Tests {
@@ -15,6 +16,7 @@ object pgnParser extends ScalaModule with ScalafmtModule {
 }
 
 object chessLib extends ScalaModule with ScalafmtModule {
+  def moduleDeps = Seq(chessModel)
   def scalaVersion = "2.13.5"
   def ivyDeps = Agg(ivy"com.beachape::enumeratum::1.6.1")
   object test extends Tests {
@@ -24,4 +26,10 @@ object chessLib extends ScalaModule with ScalafmtModule {
     )
     def testFrameworks = Seq("utest.runner.Framework")
   }
+}
+
+object chessModel extends ScalaModule with ScalafmtModule {
+  def scalaVersion = "2.13.5"
+  def ivyDeps = Agg(ivy"com.beachape::enumeratum::1.6.1")
+
 }

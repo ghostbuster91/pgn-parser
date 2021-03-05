@@ -1,5 +1,7 @@
 package chesslib
 
+import chessmodel._
+
 object Engine {
 
   def isSquareChecked(
@@ -51,7 +53,8 @@ object Engine {
       case Some((_, PlayerPeace(_, `currentPlayer`))) => false
       case Some((distance, PlayerPeace(peace, opponent))) =>
         peace match {
-          case Peace.Pawn    => distance == 1 && isPawnThreat(direction.opposite, opponent)
+          case Peace.Pawn =>
+            distance == 1 && isPawnThreat(direction.opposite, opponent)
           case Figure.Bishop => isBishopThreat(direction.opposite)
           case Figure.Rook   => isRookThreat(direction.opposite)
           case Figure.Queen  => true

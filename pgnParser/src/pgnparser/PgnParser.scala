@@ -2,6 +2,7 @@ package pgnparser
 
 import cats.parse.{Parser => P, Parser1 => P1, _}
 import cats.syntax.all._
+import chessmodel._
 
 object PgnParser {
   val whitespace = P.charIn(" \t\n")
@@ -11,7 +12,7 @@ object PgnParser {
   val string = P.charsWhile1(c => c != ' ').map(_.mkString)
   val property = parened(
     (string <* whitespace) ~ quotedString
-  ).map { case (k, v) => Meta(k, v) }
+  ).map { case (k, v) => Tag(k, v) }
   val properties =
     (property.with1 <* P.char('\n')).backtrack.rep
   val column = P.charIn("abcdefgh")
@@ -128,13 +129,6 @@ sealed trait SanMove {
   def check: Check
 }
 
-sealed trait Check
-object Check {
-  case object NoCheck extends Check
-  case object SimpleCheck extends Check
-  case object Checkmate extends Check
-}
-
 object SanMove {
   case class PawnMove(
       destitnation: Position,
@@ -171,16 +165,6 @@ object SanMove {
 
 case class Position(row: Char, column: Char)
 
-sealed trait Figure
-
-object Figure {
-  case object King extends Figure
-  case object Queen extends Figure
-  case object Bishop extends Figure
-  case object Knight extends Figure
-  case object Rook extends Figure
-}
-
 sealed trait GameResult
 object GameResult {
   case object WhiteWins extends GameResult
@@ -188,5 +172,5 @@ object GameResult {
   case object Draw extends GameResult
   case object Unfinished extends GameResult
 }
-case class Meta(key: String, value: String)
-case class PgnGame(meta: List[Meta], rounds: List[Round], result: GameResult)
+case class Tag(key: String, value: String)
+case class PgnGame(meta: List[Tag], rounds: List[Round], result: GameResult)

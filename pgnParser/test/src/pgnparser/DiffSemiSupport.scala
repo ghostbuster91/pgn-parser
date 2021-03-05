@@ -4,6 +4,7 @@ import cats.parse.Parser.Error
 import cats.parse.Parser.Expectation
 import com.softwaremill.diffx._
 import com.softwaremill.diffx.cats._
+import chessmodel._
 
 trait DiffSemiSupport {
   implicit val dPos = Diff.derived[Position]
@@ -14,6 +15,6 @@ trait DiffSemiSupport {
   implicit val dMove = Diff.derived[SanMove]
   implicit val dRound = Diff.derived[Round]
   implicit val dResult = Diff.derived[GameResult]
-  implicit val dMeta = Diff.derived[Meta]
+  implicit val dMeta = Diff.derived[Tag]
   implicit val dPgnGame = Diff.derived[PgnGame]
 }

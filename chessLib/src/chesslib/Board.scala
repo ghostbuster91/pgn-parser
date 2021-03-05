@@ -1,7 +1,6 @@
 package chesslib
 
 import enumeratum._
-import chesslib.Peace.Pawn
 import chesslib.Player.Black
 import chesslib.Player.White
 import chesslib.Direction.NorthWest
@@ -10,21 +9,7 @@ import chesslib.Direction.East
 import chesslib.Direction.West
 import chesslib.Direction.North
 import scala.collection.immutable
-
-sealed trait Peace
-object Peace {
-  case object Pawn extends Peace
-}
-
-sealed trait Figure extends Peace
-
-object Figure {
-  case object King extends Figure
-  case object Queen extends Figure
-  case object Bishop extends Figure
-  case object Knight extends Figure
-  case object Rook extends Figure
-}
+import chessmodel._
 
 case class PlayerPeace(peace: Peace, player: Player)
 case class Shift(rowInc: Int, colInc: Int)
@@ -54,7 +39,7 @@ object Board {
   val Starting = Whites ++ Blacks
 
   private def pawns(row: Int, player: Player) = (0 until 8)
-    .map(col => Coordinate(row, col) -> PlayerPeace(Pawn, player))
+    .map(col => Coordinate(row, col) -> PlayerPeace(Peace.Pawn, player))
     .toMap
 
   private def figures(

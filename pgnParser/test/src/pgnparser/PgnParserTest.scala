@@ -5,6 +5,7 @@ import utest._
 import com.softwaremill.diffx.ConsoleColorConfig
 import com.softwaremill.diffx.utest.DiffxAssertions._
 import PgnParser._
+import chessmodel._
 
 object PgnParserTest extends TestSuite with DiffSemiSupport {
   implicit val c: ConsoleColorConfig =
@@ -16,7 +17,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
       val output = property.parse(input)
       assertEqual(
         output,
-        Right("" -> Meta("Event", "Rated Blitz game"))
+        Right("" -> Tag("Event", "Rated Blitz game"))
       )
     }
     "parse round - pawns moves only" - {

@@ -7,7 +7,20 @@ object pgnParser extends ScalaModule with ScalafmtModule {
   object test extends Tests {
     def ivyDeps = Agg(
       ivy"com.lihaoyi::utest::0.7.7",
-      ivy"com.softwaremill.diffx::diffx-utest::0.4.3"
+      ivy"com.softwaremill.diffx::diffx-utest::0.4.4",
+      ivy"com.softwaremill.diffx::diffx-cats::0.4.4"
+    )
+    def testFrameworks = Seq("utest.runner.Framework")
+  }
+}
+
+object chessLib extends ScalaModule with ScalafmtModule {
+  def scalaVersion = "2.13.5"
+  def ivyDeps = Agg(ivy"com.beachape::enumeratum::1.6.1")
+  object test extends Tests {
+    def ivyDeps = Agg(
+      ivy"com.lihaoyi::utest::0.7.7",
+      ivy"com.softwaremill.diffx::diffx-utest::0.4.4"
     )
     def testFrameworks = Seq("utest.runner.Framework")
   }

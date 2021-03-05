@@ -17,7 +17,7 @@ object ChessLibTest extends TestSuite {
         assert(!result)
       }
     }
-    "should correctly detect queens' threats" - {
+    "should correctly detect queen's threats" - {
       val board =
         Board(
           Map(
@@ -129,6 +129,65 @@ object ChessLibTest extends TestSuite {
       }
       (AllCords -- expectedThreads).foreach { coord =>
         val result = Engine.isSquareChecked(coord, board, Player.White)
+        assert(!result)
+      }
+    }
+    "should correctly detect bishop's threats" - {
+      val board =
+        Board(
+          Map(
+            Coordinate(1, 1) -> PlayerPeace(Figure.Bishop, Player.White)
+          )
+        )
+      val expectedThreads = Set(
+        Coordinate(0, 0),
+        Coordinate(2, 2),
+        Coordinate(3, 3),
+        Coordinate(4, 4),
+        Coordinate(5, 5),
+        Coordinate(6, 6),
+        Coordinate(7, 7),
+        Coordinate(2, 0),
+        Coordinate(0, 2)
+      )
+      expectedThreads.foreach { coord =>
+        val result = Engine.isSquareChecked(coord, board, Player.Black)
+        assert(result)
+      }
+      (AllCords -- expectedThreads).foreach { coord =>
+        val result = Engine.isSquareChecked(coord, board, Player.Black)
+        assert(!result)
+      }
+    }
+    "should correctly detect rook's threats" - {
+      val board =
+        Board(
+          Map(
+            Coordinate(1, 1) -> PlayerPeace(Figure.Rook, Player.White)
+          )
+        )
+      val expectedThreads = Set(
+        Coordinate(1, 0),
+        Coordinate(0, 1),
+        Coordinate(2, 1),
+        Coordinate(3, 1),
+        Coordinate(4, 1),
+        Coordinate(5, 1),
+        Coordinate(6, 1),
+        Coordinate(7, 1),
+        Coordinate(1, 2),
+        Coordinate(1, 3),
+        Coordinate(1, 4),
+        Coordinate(1, 5),
+        Coordinate(1, 6),
+        Coordinate(1, 7)
+      )
+      expectedThreads.foreach { coord =>
+        val result = Engine.isSquareChecked(coord, board, Player.Black)
+        assert(result)
+      }
+      (AllCords -- expectedThreads).foreach { coord =>
+        val result = Engine.isSquareChecked(coord, board, Player.Black)
         assert(!result)
       }
     }

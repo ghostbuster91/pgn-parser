@@ -103,11 +103,7 @@ object PgnParser {
       (whitespace *> move) ~ (whitespace *> move).backtrack.?
     ).tupled
       .map { case (round, (move1, move2)) =>
-        Round(
-          round,
-          move1,
-          move2
-        )
+        Round(round, move1, move2)
       }
   val score =
     P.string("0-1")

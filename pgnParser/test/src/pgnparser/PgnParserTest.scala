@@ -2,12 +2,11 @@ package pgnparser
 import cats.parse.{Parser => P, _}
 import cats.syntax.all._
 import utest._
-import com.softwaremill.diffx.generic.auto._
 import com.softwaremill.diffx.ConsoleColorConfig
 import com.softwaremill.diffx.utest.DiffxAssertions._
 import PgnParser._
 
-object PgnParserTest extends TestSuite {
+object PgnParserTest extends TestSuite with DiffSemiSupport {
   implicit val c: ConsoleColorConfig =
     ConsoleColorConfig(x => s"-$x", x => s"+$x", identity, identity)
 

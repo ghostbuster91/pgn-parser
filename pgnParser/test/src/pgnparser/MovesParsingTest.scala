@@ -2,10 +2,14 @@ package pgnparser
 
 import utest._
 import PgnParser._
-import com.softwaremill.diffx.generic.auto._
 import com.softwaremill.diffx.utest.DiffxAssertions._
+import cats.parse.Parser.Error
+import cats.parse.Parser.Expectation
+import com.softwaremill.diffx._
+import com.softwaremill.diffx.cats._
 
-object MovesParsingTest extends TestSuite {
+object MovesParsingTest extends TestSuite with DiffSemiSupport {
+
   val tests = Tests {
     "parse move - figure capture with column source" - {
       assertEqual(

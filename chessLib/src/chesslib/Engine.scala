@@ -34,7 +34,7 @@ object Engine {
           s"Couldn't find ${currentPlayer}'s king on board"
         )
       )
-    !isSquareChecked(kingLocation, board, currentPlayer)
+    !isSquareCheckedBy(kingLocation, board, currentPlayer.opponent)
   }
 
   private def isEligibleToMove2(
@@ -144,18 +144,18 @@ object Engine {
     }
   }
 
-  def isSquareChecked( //TODO change to isSquareCheckedBy
+  def isSquareCheckedBy(
       target: Coordinate,
       board: Board,
-      squarOwner: Player
+      opponent: Player
   ): Boolean = {
     val knightCheck = isSquareCheckedFromKnight(
       target,
       board,
-      squarOwner
+      opponent
     )
     val rayCheck = Direction.values.toList.exists(d =>
-      isSquareCheckedFromDirection(target, board, squarOwner, d)
+      isSquareCheckedFromDirection(target, board, opponent, d)
     )
     knightCheck || rayCheck //TODO lazy?
   }
@@ -163,12 +163,12 @@ object Engine {
   private def isSquareCheckedFromKnight(
       target: Coordinate,
       board: Board,
-      squareOwner: Player
+      opponent: Player
   ): Boolean = {
     val possibleKnightPlaces = getPossibleKnightMoves(target)
     possibleKnightPlaces
       .flatMap(board.getSquare)
-      .exists(pp => pp.player != squareOwner && pp.peace == Figure.Knight)
+      .exists(pp => pp.player == opponent && pp.peace == Figure.Knight)
   }
 
   private def getPossibleKnightMoves(from: Coordinate): List[Coordinate] = {
@@ -186,11 +186,12 @@ object Engine {
   private def isSquareCheckedFromDirection(
       target: Coordinate,
       board: Board,
-      squareOwner: Player,
+      opponent: Player,
       direction: Direction
   ): Boolean = {
+    val friend = opponent.opponent
     getFirstPeace(target, board, direction) match {
-      case Some((_, PlayerPeace(_, `squareOwner`))) => false
+      case Some((_, PlayerPeace(_, `friend`))) => false
       case Some((distance, PlayerPeace(peace, opponent))) =>
         peace match {
           case Peace.Pawn =>

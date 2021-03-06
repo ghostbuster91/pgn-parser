@@ -4,7 +4,7 @@ import utest._
 import chessmodel._
 import TestCoordinateParser._
 import utest.ufansi.Str
-object ChessLibTest extends TestSuite {
+object ThreatDetectorTest extends TestSuite {
 
   val tests = Tests {
     "empty board shouldn't produce any checks" - {

@@ -19,7 +19,7 @@ object ElegibleMoveTest extends TestSuite {
           |---X----
           |---X----
           |---X----
-          |XXXXXXXX
+          |XXX-XXXX
           |---X----
           |---X----
           |---X----"""
@@ -37,7 +37,7 @@ object ElegibleMoveTest extends TestSuite {
           |--------
           |--------""",
         """--------
-          |------X-
+          |--------
           |--------
           |--------
           |--------

@@ -34,7 +34,7 @@ object Engine {
           s"Couldn't find ${currentPlayer}'s king on board"
         )
       )
-    isSquareChecked(kingLocation, board, currentPlayer)
+    !isSquareChecked(kingLocation, board, currentPlayer)
   }
 
   private def isEligibleToMove(

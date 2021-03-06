@@ -23,15 +23,7 @@ case class ChessGame(
 
   private def lanMoveToMove(lan: LanMove): List[Move] = {
     lan match {
-      case LanMove.FigureMove(figure, destitnation, check, source) =>
-        List(
-          Move(
-            source.toCoord(),
-            destitnation.toCoord(),
-            PlayerPeace(figure, currentPlayer)
-          )
-        )
-      case LanMove.FigureCapture(destitnation, figure, check, source) =>
+      case LanMove.FigureMove(figure, destitnation, check, source, _) =>
         List(
           Move(
             source.toCoord(),
@@ -120,14 +112,8 @@ object LanMove {
       figure: Figure,
       destitnation: Position,
       check: Check,
-      source: Position
-  ) extends LanMove
-
-  case class FigureCapture(
-      destitnation: Position,
-      figure: Figure,
-      check: Check,
-      source: Position
+      source: Position,
+      isCapture: Boolean
   ) extends LanMove
 
   case class PawnCapture(

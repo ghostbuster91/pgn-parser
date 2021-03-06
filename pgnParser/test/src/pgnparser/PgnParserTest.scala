@@ -49,7 +49,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
               Position('f', '3'),
               Check.NoCheck,
               None,
-              None
+              None,
+              isCapture = false
             ),
             Some(
               SanMove.PawnMove(Position('e', '6'), Check.NoCheck, None)
@@ -71,7 +72,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
               Position('c', '1'),
               Check.NoCheck,
               None,
-              Some('a')
+              Some('a'),
+              isCapture = false
             ),
             Some(SanMove.PawnMove(Position('e', '6'), Check.NoCheck, None))
           )
@@ -91,7 +93,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
               Position('a', '6'),
               Check.SimpleCheck,
               None,
-              None
+              None,
+              isCapture = false
             ),
             Some(
               SanMove.FigureMove(
@@ -99,7 +102,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
                 Position('c', '5'),
                 Check.NoCheck,
                 None,
-                None
+                None,
+                isCapture = false
               )
             )
           )
@@ -119,7 +123,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
               Position('a', '6'),
               Check.NoCheck,
               None,
-              None
+              None,
+              isCapture = false
             ),
             Some(
               SanMove.FigureMove(
@@ -127,7 +132,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
                 Position('c', '5'),
                 Check.Checkmate,
                 None,
-                None
+                None,
+                isCapture = false
               )
             )
           )
@@ -147,7 +153,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
               Position('a', '6'),
               Check.NoCheck,
               None,
-              None
+              None,
+              isCapture = false
             ),
             None
           )
@@ -162,12 +169,13 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
         Right(
           "" -> Round(
             19,
-            SanMove.FigureCapture(
-              Position('f', '3'),
+            SanMove.FigureMove(
               Figure.Bishop,
+              Position('f', '3'),
               Check.NoCheck,
               None,
-              None
+              None,
+              isCapture = true
             ),
             None
           )
@@ -219,12 +227,13 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
         Right(
           "" -> Round(
             9,
-            SanMove.FigureCapture(
-              Position('c', '6'),
+            SanMove.FigureMove(
               Figure.Bishop,
+              Position('c', '6'),
               Check.SimpleCheck,
               None,
-              None
+              None,
+              isCapture = true
             ),
             None
           )
@@ -400,7 +409,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
                 Position('f', '4'),
                 Check.NoCheck,
                 None,
-                None
+                None,
+                isCapture = false
               ),
               Some(
                 SanMove.PawnMove(

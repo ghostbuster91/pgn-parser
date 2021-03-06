@@ -62,19 +62,27 @@ object PgnParser {
   //Nf3, Nbf3
   val figureMove = (figure ~ sourceDest ~ checkRule).map {
     case ((f, pos), check) =>
-      SanMove.FigureMove(f, pos.position, check, pos.row, pos.col)
+      SanMove.FigureMove(
+        f,
+        pos.position,
+        check,
+        pos.row,
+        pos.col,
+        isCapture = false
+      )
   }
 
 //Bdxd4
   val figureCapture =
     ((figure ~ source.backtrack.? <* P.char('x')) ~ position ~ checkRule).map {
       case (((f, src), pos), check) =>
-        SanMove.FigureCapture(
-          pos,
+        SanMove.FigureMove(
           f,
+          pos,
           check,
           src.flatMap(_.row),
-          src.flatMap(_.col)
+          src.flatMap(_.col),
+          isCapture = true
         ): SanMove
     }
   //cxd4
@@ -141,15 +149,8 @@ object SanMove {
       destitnation: Position,
       check: Check,
       sourceRow: Option[Char],
-      sourceCol: Option[Char]
-  ) extends SanMove
-
-  case class FigureCapture(
-      destitnation: Position,
-      figure: Figure,
-      check: Check,
-      sourceRow: Option[Char],
-      sourceCol: Option[Char]
+      sourceCol: Option[Char],
+      isCapture: Boolean
   ) extends SanMove
 
   case class PawnCapture(

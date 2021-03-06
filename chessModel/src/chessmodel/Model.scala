@@ -128,14 +128,14 @@ object Position {
       case 7 => 'h'
     }
     val row = coord.row match {
-      case 1 => '0'
-      case 2 => '1'
-      case 3 => '2'
-      case 4 => '3'
-      case 5 => '4'
-      case 6 => '5'
-      case 7 => '6'
-      case 8 => '7'
+      case 0 => '1'
+      case 1 => '2'
+      case 2 => '3'
+      case 3 => '4'
+      case 4 => '5'
+      case 5 => '6'
+      case 6 => '7'
+      case 7 => '8'
     }
     Position(row, col)
   }

@@ -11,7 +11,7 @@ object Engine {
       figure: Figure,
       currentPlayer: Player
   ): Boolean = {
-    val figureRule = isEligibleToMove(from, to, board, figure)
+    val figureRule = isEligibleToMove2(from, to, board, figure, currentPlayer)
     if (figureRule) {
       val afterMove =
         board.move(Move(from, to, PlayerPeace(figure, currentPlayer)))
@@ -37,25 +37,26 @@ object Engine {
     !isSquareChecked(kingLocation, board, currentPlayer)
   }
 
-  private def isEligibleToMove(
+  private def isEligibleToMove2(
       from: Coordinate,
       to: Coordinate,
       board: Board,
-      figure: Figure
+      figure: Figure,
+      currentPlayer: Player
   ): Boolean = {
-    figure match {
+    val r1 = figure match {
       case Figure.King =>
         throw new RuntimeException("Not implemented by design")
       case Figure.Queen =>
-        isBishopEligibleToMove(from, to, board) || isRookEligibleToMove(
-          from,
-          to,
-          board
-        )
+        val bishop = isBishopEligibleToMove(from, to, board)
+        val rook = isRookEligibleToMove(from, to, board)
+        rook || bishop
       case Figure.Bishop => isBishopEligibleToMove(from, to, board)
       case Figure.Knight => isKnightEligibleToMove(from, to)
       case Figure.Rook   => isRookEligibleToMove(from, to, board)
     }
+
+    r1 && evilOrEmpty(to, board, currentPlayer)
   }
 
   private def isBishopEligibleToMove(
@@ -70,7 +71,7 @@ object Engine {
     }
     // y = -x +c
     val negative = cCandidates.map(_ + 7).exists { c =>
-      from.row == from.col + c && to.row == to.col + c
+      from.row == -from.col + c && to.row == -to.col + c
     }
     if (positive || negative) {
       val dir = if (positive) {
@@ -88,14 +89,24 @@ object Engine {
       } else {
         throw new RuntimeException("qwe")
       }
-      val squares = LazyList
+      val squaresBetween = LazyList
         .unfold(from)(s => s.shift(dir.shift).map(c => c -> c))
-        .drop(1)
         .takeWhile(c => c != to)
-      noFiguresAt(squares, board)
+        .drop(1)
+      noFiguresAt(squaresBetween, board)
     } else {
       false
     }
+  }
+
+  private def evilOrEmpty(
+      coord: Coordinate,
+      board: Board,
+      currentPlayer: Player
+  ): Boolean = {
+    board
+      .getSquare(coord)
+      .forall(pp => pp.player == currentPlayer.opponent)
   }
 
   private def noFiguresAt(
@@ -107,10 +118,11 @@ object Engine {
   private def isKnightEligibleToMove(
       from: Coordinate,
       to: Coordinate
-  ): Boolean =
-    getPossibleKnightMoves(from).contains(to)
-
-  private def isRookEligibleToMove(
+  ): Boolean = {
+    getPossibleKnightMoves(from)
+      .contains(to)
+  }
+  private def isRookEligibleToMove( //return list of squares between instead
       from: Coordinate,
       to: Coordinate,
       board: Board

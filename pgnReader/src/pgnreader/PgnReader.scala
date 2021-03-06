@@ -36,7 +36,6 @@ class PgnReader extends Reader {
       game: ChessGame,
       sanMove: SanMove
   ): LanMove = {
-    println(sanMove)
     sanMove match {
       case spm: SanMove.PawnMove          => handlePawnMove(spm, game)
       case sfm: SanMove.FigureMove        => handleFigureMove(sfm, game)
@@ -77,7 +76,7 @@ class PgnReader extends Reader {
     )
   }
 
-  private def findPawnMoveSource(
+  private def findPawnMoveSource( //Move to engine
       board: Board,
       dest: Coordinate,
       currentPlayer: Player
@@ -96,7 +95,12 @@ class PgnReader extends Reader {
           case Player.White => 1
         }
         val pawnRowHop = pawnRow + 2 * pawnDirection.shift.rowInc
-        isOneSquareFrom || (src.row == pawnRow && dest.row == pawnRowHop)
+        val nextSquare = src.shift(pawnDirection.shift).get //TODO
+        val isJump = (src.col == dest.col &&
+          src.row == pawnRow &&
+          dest.row == pawnRowHop &&
+          board.getSquare(nextSquare).isEmpty)
+        isOneSquareFrom || isJump
       }
       .getOrElse(
         throw new RuntimeException(
@@ -104,6 +108,7 @@ class PgnReader extends Reader {
         )
       )
   }
+
   private def findPawnCaptureSourec( //TODO add bicie w przelocie
       board: Board,
       dest: Coordinate,

@@ -6,7 +6,7 @@ object PgnReaderTest extends TestSuite {
   val tests = Tests {
     "should work" - {
       val input =
-        """1. e4 c5 2. c3 Nc6 3. Nf3 d6 4. d4 cxd4 5. cxd4 g6 6. Bb5 Nf6 7. d5 Qa5+ 8. Nc3 Nxe4 9. Bxc6+ bxc6 10. Bd2 Nxd2 11. Qxd2 Bg7 12. dxc6 13. Bg4 14. Rfe1 e6 15. a3 Rfd8 16. b4 Qc7 17. Rac1 Qxc6 18. Qd3 Bf5 19. Qe3 Qd7 20. Nd4 Bxd4 21. Qxd4 e5 22. Qh4 Be6 23. Ne4 Kg7 24. Nf6 Qe7 25. Nh5+ Kf8 26. Qxe7+ Kxe7 27. Ng3 f5 28. Rc7+ Kf6 29. Rxh7 d5 30. h3 d4 31. Rc7 d3 32. Rd1 e4 33. Nf1 Rdc8 34. Rdc1 Rxc7 35. Rxc7 Rc8 36. Rxc8 Bxc8 37. Nd2 Be6 38. Kf1 g5 39. Ke1 Ke5 40. Kd1 Kd4 41. Kc1 Kc3 42. b5 Bd7 43. a4 Kb4 44. Nb1 Kxa4 45. Nc3+ Kb4 46. Kd2 Bxb5 47. Nd5+ Kc5 48. Ne3 Bd7 49. Nd1 a5 50. Nc3 Kd4 51. Nb1 a4 52. Na3 f4 53. Nb1 e3+ 54. fxe3+ fxe3+ 55. Ke1 d2+ 56. Nxd2 exd2+ 57. Kxd2 a3 58. Kc2 a2 59. Kb2 Be6 60. g4 Ke4 61. Kc3 Kf4 62. Kd2 Kg3 63. Ke3 a1=Q 0-1"""
+        """1. d4 d5 2. e4 dxe4 3. f3 exf3 4. Nc3 fxg2 5. Bxg2 Nf6 6. Nf3 e6 7. O-O c6 8. Bg5 Be7 9. Ne5 O-O 10. Qd3 Nbd7 11. Nxd7 Qxd7 12. Bxf6 Bxf6 13. Be4 Qxd4+ 14. Qxd4 Bxd4+ 15. Kh1 Bxc3 16. bxc3 e5 17. Rf3 f5 18. Raf1 Be6 19. Bxf5 Bxf5 20. Rxf5 Rxf5 21. Rxf5 Re8 22. Kg2 g6 23. Rf3 Kg7 24. Kg3 e4 25. Re3 Kf6 26. c4 Ke5 27. c3 Kf5 28. a4 b6 29. h3 Rd8 30. Kf2 Rd3 31. Rxd3 exd3 32. Ke3 Ke5 33. Kxd3 c5 34. Ke3 g5 35. Kf3 h5 36. Ke3 a6 37. Kf3 Kf5 38. Ke3 g4 39. h4 g3 40. Kf3 g2 41. Kxg2 Kg4 42. Kh2 Kxh4 43. Kg2 Kg4 44. Kf2 h4 45. Kg2 h3+ 46. Kh2 Kf3 47. Kxh3 Ke3 48. Kg4 Kd3 49. Kf5 Kxc3 50. Ke6 Kxc4 51. Kd6 Kb4 52. Kc6 Kxa4 53. Kxb6 c4 54. Kc5 c3 55. Kc4 c2 56. Kc3 c1=Q+ 0-1"""
 
       println(new PgnReader().read(input))
     }

@@ -43,8 +43,9 @@ case class Board(peaces: Map[Coordinate, PlayerPeace]) {
     acc.move(item)
   }
 
-  def move(m: Move): Board =
+  def move(m: Move): Board = {
     copy(peaces = peaces - m.from + (m.to -> m.peace))
+  }
 }
 
 case class Move(from: Coordinate, to: Coordinate, peace: PlayerPeace)

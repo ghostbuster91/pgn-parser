@@ -122,7 +122,7 @@ object Engine {
     getPossibleKnightMoves(from)
       .contains(to)
   }
-  private def isRookEligibleToMove( //return list of squares between instead
+  private def isRookEligibleToMove(
       from: Coordinate,
       to: Coordinate,
       board: Board

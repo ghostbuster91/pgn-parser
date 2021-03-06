@@ -154,7 +154,7 @@ object SanMove {
 
   case class PawnCapture(
       destitnation: Position,
-      sourceRow: Char,
+      sourceCol: Char,
       check: Check,
       promotion: Option[Figure]
   ) extends SanMove
@@ -162,8 +162,6 @@ object SanMove {
   case class QueenSideCastle(check: Check) extends SanMove
   case class KingSideCastle(check: Check) extends SanMove
 }
-
-case class Position(row: Char, column: Char)
 
 sealed trait GameResult
 object GameResult {

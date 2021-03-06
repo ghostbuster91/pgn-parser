@@ -23,7 +23,7 @@ object ElegibleMoveTest extends TestSuite {
           |---X----
           |---X----
           |---X----"""
-      )(LocatedPeace(Position('4', 'd'), Player.White))
+      )(LocatedPeace(Position('d', '4'), Player.White))
     }
 
     "pinned rook shouldn't be able to move" - {
@@ -44,7 +44,7 @@ object ElegibleMoveTest extends TestSuite {
           |--------
           |--------
           |--------"""
-      )(LocatedPeace(Position('7', 'g'), Player.White))
+      )(LocatedPeace(Position('g', '7'), Player.White))
     }
   }
   private def test(strBoard: String, strMatrix: String)(lp: LocatedPeace) = {

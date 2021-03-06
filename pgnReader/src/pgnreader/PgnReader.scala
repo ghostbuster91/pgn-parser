@@ -9,6 +9,8 @@ import cats.syntax.all._
 import chessmodel._
 import chesslib._
 import scala.collection.immutable
+import chessmodel.Player.Black
+import chessmodel.Player.White
 
 class PgnReader extends Reader {
   def read(pgnString: String): Either[ParsingException, ChessGame] = {
@@ -34,6 +36,7 @@ class PgnReader extends Reader {
       game: ChessGame,
       sanMove: SanMove
   ): LanMove = {
+    println(sanMove)
     sanMove match {
       case spm: SanMove.PawnMove          => handlePawnMove(spm, game)
       case sfm: SanMove.FigureMove        => handleFigureMove(sfm, game)
@@ -81,14 +84,27 @@ class PgnReader extends Reader {
   ): Coordinate = {
     board.peaces
       .collect { case (c, PlayerPeace(Peace.Pawn, `currentPlayer`)) => c }
-      .find(src => src.col == dest.col && src.row == dest.row - 1)
+      .find { src =>
+        val pawnDirection = currentPlayer match {
+          case Player.Black => Direction.South
+          case Player.White => Direction.North
+        }
+        val isOneSquareFrom =
+          src.col == dest.col && src.row == dest.row - pawnDirection.shift.rowInc
+        val pawnRow = currentPlayer match {
+          case Player.Black => 6
+          case Player.White => 1
+        }
+        val pawnRowHop = pawnRow + 2 * pawnDirection.shift.rowInc
+        isOneSquareFrom || (src.row == pawnRow && dest.row == pawnRowHop)
+      }
       .getOrElse(
         throw new RuntimeException(
-          s"Couldn't find a pawn to move to ${dest} by ${currentPlayer}"
+          s"Couldn't find a pawn to move to ${Position.fromCoord(dest)} by ${currentPlayer}"
         )
       )
   }
-  private def findPawnCaptureSourec(
+  private def findPawnCaptureSourec( //TODO add bicie w przelocie
       board: Board,
       dest: Coordinate,
       currentPlayer: Player,
@@ -98,12 +114,46 @@ class PgnReader extends Reader {
       .collect { case (coord, PlayerPeace(Peace.Pawn, currentPlayer)) =>
         coord
       }
-      .find(source => source.row == dest.row - 1 && source.col == sourceCol)
+      .find { source =>
+        val pawnDirection = currentPlayer match {
+          case Player.Black => Direction.South
+          case Player.White => Direction.North
+        }
+        (source.row == dest.row - pawnDirection.shift.rowInc) &&
+        (source.col == columnToInt(sourceCol))
+      }
       .getOrElse(
         throw new RuntimeException(
-          s"Couldn't find a pawn to capture on ${dest} by ${currentPlayer} from ${sourceCol}"
+          s"Couldn't find a pawn to capture on ${Position
+            .fromCoord(dest)} by ${currentPlayer} from ${sourceCol}"
         )
       )
+  }
+
+  private def columnToInt(char: Char): Int = { //TODO create proper type for column
+    char match {
+      case 'a' => 0
+      case 'b' => 1
+      case 'c' => 2
+      case 'd' => 3
+      case 'e' => 4
+      case 'f' => 5
+      case 'g' => 6
+      case 'h' => 7
+    }
+  }
+
+  private def rowToInt(char: Char): Int = { //TODO create proper type for row
+    char match {
+      case '1' => 0
+      case '2' => 1
+      case '3' => 2
+      case '4' => 3
+      case '5' => 4
+      case '6' => 5
+      case '7' => 6
+      case '8' => 7
+    }
   }
 
   private def handleFigureMove(
@@ -116,19 +166,19 @@ class PgnReader extends Reader {
           sanMove.figure,
           sanMove.destitnation,
           sanMove.check,
-          Position.fromCoord(Coordinate(srcRow, srcCol)),
+          Position(srcCol, srcRow),
           isCapture = sanMove.isCapture
         )
       case (Some(srcCol), None) =>
         handleFigureMoveGeneric(game, sanMove) {
           case (c, PlayerPeace(sanMove.figure, game.currentPlayer))
-              if c.col == srcCol =>
+              if c.col == columnToInt(srcCol) =>
             c
         }
       case (None, Some(srcRow)) =>
         handleFigureMoveGeneric(game, sanMove) {
           case (coord, PlayerPeace(sanMove.figure, game.currentPlayer))
-              if coord.row == srcRow =>
+              if coord.row == rowToInt(srcRow) =>
             coord
         }
       case (None, None) =>
@@ -173,7 +223,7 @@ class PgnReader extends Reader {
       candidates: List[Coordinate]
   ) = {
     candidates
-      .find { coord =>
+      .filter { coord =>
         Engine.isEligibleToMove(
           coord,
           sanMove.destitnation.toCoord(),
@@ -190,9 +240,11 @@ class PgnReader extends Reader {
           Position.fromCoord(source),
           isCapture = sanMove.isCapture
         )
-      }
-      .getOrElse(
-        throw new RuntimeException("No eligible figures to move")
-      ) //TODO handle multiple
+      } match {
+      case head :: Nil => head
+      case multiple @ _ :: _ =>
+        throw new RuntimeException("Multiple ambigious figures to move")
+      case Nil => throw new RuntimeException("No eligible figures to move")
+    }
   }
 }

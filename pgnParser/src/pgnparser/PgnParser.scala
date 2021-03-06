@@ -53,9 +53,7 @@ object PgnParser {
     })
 
   val source = position.backtrack
-    .map(p =>
-      Source(Some(p.row), Some(p.column))
-    ) //TODO why inverted? this is weird
+    .map(p => Source(Some(p.column), Some(p.row)))
     .orElse1(column.map(c => Source(Some(c), None)))
     .orElse1(row.map(r => Source(None, Some(r))))
 

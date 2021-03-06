@@ -90,7 +90,7 @@ object Player {
   }
 }
 
-case class Position(row: Char, column: Char) {
+case class Position(column: Char, row: Char) {
   def toCoord(): Coordinate = {
     val col = this.column match {
       case 'a' => 0
@@ -137,6 +137,6 @@ object Position {
       case 6 => '7'
       case 7 => '8'
     }
-    Position(row, col)
+    Position(col, row)
   }
 }

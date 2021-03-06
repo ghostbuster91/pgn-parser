@@ -190,8 +190,7 @@ object ThreatDetectorTest extends TestSuite {
   }
 
   private def test(strBoard: String, strMatrix: String)(player: Player) = {
-    val matrix = TestCoordinateParser
-      .parse(strMatrix.stripMargin)
+    val matrix = TestCoordinateParser.parseExp(strMatrix.stripMargin)
     val board = TestCoordinateParser.parseBoard(strBoard.stripMargin)
     matrix.foreach { case (coord, expected) =>
       val result = Engine.isSquareChecked(coord, board, player)

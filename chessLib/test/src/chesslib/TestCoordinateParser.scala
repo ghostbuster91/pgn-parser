@@ -8,7 +8,7 @@ import chessmodel.Peace
 import chessmodel.Player
 
 object TestCoordinateParser {
-  def parse(expectations: String): Map[Coordinate, Boolean] = {
+  def parseExp(expectations: String): Map[Coordinate, Boolean] = {
     val rows = expectations.split('\n').zipWithIndex
     val expectationMatrix = rows.flatMap { case (textRow, rowId) =>
       textRow.zipWithIndex.map { case (square, colId) =>

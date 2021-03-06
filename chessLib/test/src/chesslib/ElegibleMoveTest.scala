@@ -48,8 +48,7 @@ object ElegibleMoveTest extends TestSuite {
     }
   }
   private def test(strBoard: String, strMatrix: String)(lp: LocatedPeace) = {
-    val matrix = TestCoordinateParser
-      .parse(strMatrix.stripMargin)
+    val matrix = TestCoordinateParser.parseExp(strMatrix.stripMargin)
     val board = TestCoordinateParser.parseBoard(strBoard.stripMargin)
     matrix.foreach { case (coord, expected) =>
       val figure =

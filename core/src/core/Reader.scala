@@ -2,6 +2,7 @@ package core
 
 import chessmodel._
 import chessmodel.position._
+import chessmodel.coordinate.Coordinate
 
 trait Reader {
   def read(game: String): Either[ParsingException, ChessGame]
@@ -22,27 +23,41 @@ case class ChessGame(
     )
   }
 
-  private def lanMoveToMove(lan: LanMove): List[Move] = {
+  private def lanMoveToMove(lan: LanMove): List[Transformation] = {
     lan match {
       case LanMove.FigureMove(figure, destitnation, check, source, _) =>
         List(
-          Move(
+          Transformation.Move(
             source.toCoord(),
             destitnation.toCoord(),
             PlayerPeace(figure, currentPlayer)
           )
         )
       case LanMove.PawnCapture(destitnation, source, check, promotion) =>
-        List(
-          Move(
-            source.toCoord(),
-            destitnation.toCoord(),
-            PlayerPeace(promotion.getOrElse(Peace.Pawn), currentPlayer)
-          )
-        )
+        board.getSquare(destitnation.toCoord()) match {
+          case Some(v) =>
+            List(
+              Transformation.Move(
+                source.toCoord(),
+                destitnation.toCoord(),
+                PlayerPeace(promotion.getOrElse(Peace.Pawn), currentPlayer)
+              )
+            )
+          case None =>
+            List(
+              Transformation.Move(
+                source.toCoord(),
+                destitnation.toCoord(),
+                PlayerPeace(promotion.getOrElse(Peace.Pawn), currentPlayer)
+              ),
+              Transformation.Remove(
+                Coordinate(destitnation.toCoord().col, source.toCoord().row)
+              )
+            )
+        }
       case LanMove.PawnMove(source, destitnation, check, promotion) =>
         List(
-          Move(
+          Transformation.Move(
             source.toCoord(),
             destitnation.toCoord(),
             PlayerPeace(promotion.getOrElse(Peace.Pawn), currentPlayer)
@@ -63,12 +78,12 @@ case class ChessGame(
 
   private def queenSideCastle(row: Rank) = {
     List(
-      Move(
+      Transformation.Move(
         Position(File('e'), row).toCoord(),
         Position(File('c'), row).toCoord(),
         PlayerPeace(Figure.King, currentPlayer)
       ),
-      Move(
+      Transformation.Move(
         Position(File('a'), row).toCoord(),
         Position(File('d'), row).toCoord(),
         PlayerPeace(Figure.Rook, currentPlayer)
@@ -78,12 +93,12 @@ case class ChessGame(
 
   private def kingSideCastle(row: Rank) = {
     List(
-      Move(
+      Transformation.Move(
         Position(File('e'), row).toCoord(),
         Position(File('g'), row).toCoord(),
         PlayerPeace(Figure.King, currentPlayer)
       ),
-      Move(
+      Transformation.Move(
         Position(File('h'), row).toCoord(),
         Position(File('f'), row).toCoord(),
         PlayerPeace(Figure.Rook, currentPlayer)

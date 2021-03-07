@@ -15,7 +15,9 @@ object Engine {
     val figureRule = isEligibleToMove2(from, to, board, figure, currentPlayer)
     if (figureRule) {
       val afterMove =
-        board.move(Move(from, to, PlayerPeace(figure, currentPlayer)))
+        board.move(
+          Transformation.Move(from, to, PlayerPeace(figure, currentPlayer))
+        )
       isEligibleToMoveKingRule(afterMove, currentPlayer)
     } else {
       false

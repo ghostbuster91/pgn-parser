@@ -10,33 +10,20 @@ import chessmodel.Player
 object TestCoordinateParser {
   def parseExp(expectations: String): Map[Coordinate, Boolean] = {
     val rows = expectations.split('\n').zipWithIndex
-    val expectationMatrix = rows.flatMap { case (textRow, rowId) =>
+    rows.flatMap { case (textRow, rowId) =>
       textRow.zipWithIndex.map { case (square, colId) =>
         Coordinate(Column(colId), Row(7 - rowId)) -> (square == 'X')
       }
     }.toMap
-    expectationMatrix
   }
   def parseBoard(str: String): Board = {
     val rows = str.split('\n').zipWithIndex
     val board = rows
       .flatMap { case (textRow, rowId) =>
         textRow.zipWithIndex.map { case (square, colId) =>
-          Coordinate(Column(colId), Row(7 - rowId)) -> (square match {
-            case 'Q' => Some(PlayerPeace(Figure.Queen, Player.White))
-            case 'K' => Some(PlayerPeace(Figure.King, Player.White))
-            case 'B' => Some(PlayerPeace(Figure.Bishop, Player.White))
-            case 'P' => Some(PlayerPeace(Peace.Pawn, Player.White))
-            case 'R' => Some(PlayerPeace(Figure.Rook, Player.White))
-            case 'N' => Some(PlayerPeace(Figure.Knight, Player.White))
-            case 'q' => Some(PlayerPeace(Figure.Queen, Player.Black))
-            case 'k' => Some(PlayerPeace(Figure.King, Player.Black))
-            case 'b' => Some(PlayerPeace(Figure.Bishop, Player.Black))
-            case 'p' => Some(PlayerPeace(Peace.Pawn, Player.Black))
-            case 'r' => Some(PlayerPeace(Figure.Rook, Player.Black))
-            case 'n' => Some(PlayerPeace(Figure.Knight, Player.Black))
-            case _   => None
-          })
+          Coordinate(Column(colId), Row(7 - rowId)) -> (PlayerPeace.fromChar(
+            square
+          ))
         }
       }
       .collect { case (coord, Some(p)) => coord -> p }

@@ -16,6 +16,7 @@ import chessmodel.position._
 import java.text.ParseException
 
 class PgnReader extends Reader {
+
   def read(pgnString: String): Either[ParsingException, ChessGame] = {
     val result = PgnParser.pgnGame.parseAll(pgnString)
     for {
@@ -39,17 +40,20 @@ class PgnReader extends Reader {
     val pgnMoves = result.rounds
       .flatMap(r => List(r.firstMove) ++ r.secondMove)
     pgnMoves.foldLeft(ChessGame.Starting.asRight[ParsingException]) {
-      case (Right(game), sanMove) =>
-        val lanMove = toLanMove(game, sanMove) //TODO to either
-        lanMove match {
-          case Left(value)  => Left(ParsingException(value))
-          case Right(value) => Right(game.move(value))
-        }
-      case (Left(error), _) => Left(error)
+      case (Right(game), sanMove) => applyMove(game, sanMove)
+      case (Left(error), _)       => Left(error)
     }
   }
 
-  def toLanMove(
+  def applyMove(game: ChessGame, sanMove: SanMove) = {
+    val lanMove = toLanMove(game, sanMove)
+    lanMove match {
+      case Left(value)  => Left(ParsingException(value))
+      case Right(value) => Right(game.move(value))
+    }
+  }
+
+  private def toLanMove(
       game: ChessGame,
       sanMove: SanMove
   ): Either[String, LanMove] = {
@@ -80,7 +84,7 @@ class PgnReader extends Reader {
       game: ChessGame
   ) = {
     val coordDest = sanMove.destitnation.toCoord()
-    val source = findPawnCaptureSourec(
+    val source = findPawnCaptureSource(
       game.board,
       coordDest,
       game.currentPlayer,
@@ -109,7 +113,7 @@ class PgnReader extends Reader {
       )
   }
 
-  private def findPawnCaptureSourec( //TODO add bicie w przelocie
+  private def findPawnCaptureSource(
       board: Board,
       dest: Coordinate,
       currentPlayer: Player,
@@ -233,7 +237,7 @@ class PgnReader extends Reader {
         )
       case Nil =>
         Left(
-          s"No eligible ${sanMove.figure} to move to ${sanMove.destitnation}"
+          s"No eligible ${sanMove.figure} to move to ${sanMove.destitnation} by ${game.currentPlayer}"
         )
     }
   }

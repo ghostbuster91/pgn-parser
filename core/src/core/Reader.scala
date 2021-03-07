@@ -50,42 +50,42 @@ case class ChessGame(
         )
       case LanMove.QueenSideCastle(check) =>
         currentPlayer match {
-          case Player.Black => queenSideCastle('8')
-          case Player.White => queenSideCastle('1')
+          case Player.Black => queenSideCastle(Rank('8'))
+          case Player.White => queenSideCastle(Rank('1'))
         }
       case LanMove.KingSideCastle(check) =>
         currentPlayer match {
-          case Player.Black => kingSideCastle('8')
-          case Player.White => kingSideCastle('1')
+          case Player.Black => kingSideCastle(Rank('8'))
+          case Player.White => kingSideCastle(Rank('1'))
         }
     }
   }
 
-  private def queenSideCastle(row: Char) = {
+  private def queenSideCastle(row: Rank) = {
     List(
       Move(
-        Position('e', row).toCoord(),
-        Position('c', row).toCoord(),
+        Position(File('e'), row).toCoord(),
+        Position(File('c'), row).toCoord(),
         PlayerPeace(Figure.King, currentPlayer)
       ),
       Move(
-        Position('a', row).toCoord(),
-        Position('d', row).toCoord(),
+        Position(File('a'), row).toCoord(),
+        Position(File('d'), row).toCoord(),
         PlayerPeace(Figure.Rook, currentPlayer)
       )
     )
   }
 
-  private def kingSideCastle(row: Char) = {
+  private def kingSideCastle(row: Rank) = {
     List(
       Move(
-        Position('e', row).toCoord(),
-        Position('g', row).toCoord(),
+        Position(File('e'), row).toCoord(),
+        Position(File('g'), row).toCoord(),
         PlayerPeace(Figure.King, currentPlayer)
       ),
       Move(
-        Position('h', row).toCoord(),
-        Position('f', row).toCoord(),
+        Position(File('h'), row).toCoord(),
+        Position(File('f'), row).toCoord(),
         PlayerPeace(Figure.Rook, currentPlayer)
       )
     )

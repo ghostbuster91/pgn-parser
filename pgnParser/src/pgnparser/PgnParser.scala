@@ -16,10 +16,12 @@ object PgnParser {
   ).map { case (k, v) => Tag(k, v) }
   val properties =
     (property.with1 <* P.char('\n')).backtrack.rep
-  val column = P.charIn("abcdefgh")
+  val column = P.charIn("abcdefgh").map(File.apply)
   val digit = P.charIn("0123456789")
-  val row = P.charIn("12345678")
-  val position = (column ~ row).map { case (c, r) => Position(c, r) }
+  val row = P.charIn("12345678").map(Rank.apply)
+  val position = (column ~ row).map { case (c, r) =>
+    Position(c, r)
+  }
   val roundNumber = digit.rep1.map(_.mkString_("").toInt)
   val figure = P.charIn("KQNBR").map {
     case 'K' => Figure.King
@@ -65,8 +67,8 @@ object PgnParser {
         f,
         pos.position,
         check,
-        pos.row,
-        pos.col,
+        pos.rank,
+        pos.file,
         isCapture = false
       )
   }
@@ -129,8 +131,12 @@ object PgnParser {
         PgnGame(props.getOrElse(List.empty), rounds, score)
       }
 }
-case class Source(col: Option[Char], row: Option[Char])
-case class SourceDest(col: Option[Char], row: Option[Char], position: Position)
+case class Source(col: Option[File], row: Option[Rank])
+case class SourceDest(
+    file: Option[File],
+    rank: Option[Rank],
+    position: Position
+)
 case class Round(number: Int, firstMove: SanMove, secondMove: Option[SanMove])
 sealed trait SanMove {
   def check: Check
@@ -147,14 +153,14 @@ object SanMove {
       figure: Figure,
       destitnation: Position,
       check: Check,
-      sourceRow: Option[Char],
-      sourceCol: Option[Char],
+      sourceRow: Option[Rank],
+      sourceCol: Option[File],
       isCapture: Boolean
   ) extends SanMove
 
   case class PawnCapture(
       destitnation: Position,
-      sourceCol: Char,
+      sourceCol: File,
       check: Check,
       promotion: Option[Figure]
   ) extends SanMove

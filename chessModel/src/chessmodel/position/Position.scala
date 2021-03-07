@@ -2,7 +2,7 @@ package chessmodel.position
 
 import chessmodel.coordinate._
 
-case class Position(file: Char, rank: Char) {
+case class Position(file: File, rank: Rank) {
   def toCoord(): Coordinate = {
     val col = Row(this.file match {
       case 'a' => 0
@@ -29,7 +29,7 @@ case class Position(file: Char, rank: Char) {
 }
 object Position {
   def fromCoord(coord: Coordinate): Position = {
-    val col = coord.col match {
+    val file = File(coord.col match {
       case 0 => 'a'
       case 1 => 'b'
       case 2 => 'c'
@@ -38,8 +38,8 @@ object Position {
       case 5 => 'f'
       case 6 => 'g'
       case 7 => 'h'
-    }
-    val row = coord.row match {
+    })
+    val rank = Rank(coord.row match {
       case 0 => '1'
       case 1 => '2'
       case 2 => '3'
@@ -48,7 +48,7 @@ object Position {
       case 5 => '6'
       case 6 => '7'
       case 7 => '8'
-    }
-    Position(col, row)
+    })
+    Position(file, rank)
   }
 }

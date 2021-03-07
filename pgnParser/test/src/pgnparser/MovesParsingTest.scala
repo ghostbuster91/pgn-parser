@@ -19,10 +19,10 @@ object MovesParsingTest extends TestSuite with DiffSemiSupport {
         Right(
           "" -> SanMove.FigureMove(
             Figure.Rook,
-            Position('f', '2'),
+            Position(File('f'), Rank('2')),
             Check.NoCheck,
             None,
-            Some('e'),
+            Some(File('e')),
             isCapture = true
           )
         )
@@ -34,9 +34,9 @@ object MovesParsingTest extends TestSuite with DiffSemiSupport {
         Right(
           "" -> SanMove.FigureMove(
             Figure.Rook,
-            Position('f', '2'),
+            Position(File('f'), Rank('2')),
             Check.NoCheck,
-            Some('1'),
+            Some(Rank('1')),
             None,
             isCapture = true
           )
@@ -49,10 +49,10 @@ object MovesParsingTest extends TestSuite with DiffSemiSupport {
         Right(
           "" -> SanMove.FigureMove(
             Figure.Rook,
-            Position('f', '2'),
+            Position(File('f'), Rank('2')),
             Check.NoCheck,
-            Some('1'),
-            Some('e'),
+            Some(Rank('1')),
+            Some(File('e')),
             isCapture = true
           )
         )

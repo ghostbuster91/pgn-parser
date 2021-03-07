@@ -97,12 +97,12 @@ class PgnReader extends Reader {
       board: Board,
       dest: Coordinate,
       currentPlayer: Player,
-      sourceCol: Char
+      source: File
   ): Coordinate = {
     board.peaces
       .collect {
         case (coord, PlayerPeace(Peace.Pawn, currentPlayer))
-            if coord.col == columnToInt(sourceCol) =>
+            if coord.col == source.toColumn =>
           coord
       }
       .find { source =>
@@ -116,35 +116,9 @@ class PgnReader extends Reader {
       .getOrElse(
         throw new RuntimeException(
           s"Couldn't find a pawn to capture on ${Position
-            .fromCoord(dest)} by ${currentPlayer} from ${sourceCol}"
+            .fromCoord(dest)} by ${currentPlayer} from ${source}"
         )
       )
-  }
-
-  private def columnToInt(char: Char): Int = { //TODO create proper type for column
-    char match {
-      case 'a' => 0
-      case 'b' => 1
-      case 'c' => 2
-      case 'd' => 3
-      case 'e' => 4
-      case 'f' => 5
-      case 'g' => 6
-      case 'h' => 7
-    }
-  }
-
-  private def rowToInt(char: Char): Int = { //TODO create proper type for row
-    char match {
-      case '1' => 0
-      case '2' => 1
-      case '3' => 2
-      case '4' => 3
-      case '5' => 4
-      case '6' => 5
-      case '7' => 6
-      case '8' => 7
-    }
   }
 
   private def handleFigureMove(
@@ -163,13 +137,13 @@ class PgnReader extends Reader {
       case (Some(srcCol), None) =>
         handleFigureMoveGeneric(game, sanMove) {
           case (c, PlayerPeace(sanMove.figure, game.currentPlayer))
-              if c.col == columnToInt(srcCol) =>
+              if c.col == srcCol.toColumn =>
             c
         }
       case (None, Some(srcRow)) =>
         handleFigureMoveGeneric(game, sanMove) {
           case (coord, PlayerPeace(sanMove.figure, game.currentPlayer))
-              if coord.row == rowToInt(srcRow) =>
+              if coord.row == srcRow.toRow =>
             coord
         }
       case (None, None) =>

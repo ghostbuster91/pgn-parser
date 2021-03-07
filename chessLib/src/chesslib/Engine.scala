@@ -60,19 +60,6 @@ object Engine {
     from.row == to.row.v - pawnDirection.shift.rowInc
   }
 
-  private def columnToInt(char: Char): Int = { //TODO create proper type for column
-    char match {
-      case 'a' => 0
-      case 'b' => 1
-      case 'c' => 2
-      case 'd' => 3
-      case 'e' => 4
-      case 'f' => 5
-      case 'g' => 6
-      case 'h' => 7
-    }
-  }
-
   private def isEligibleToMoveKingRule(
       board: Board,
       currentPlayer: Player

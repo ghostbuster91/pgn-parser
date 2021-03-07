@@ -29,9 +29,14 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
         Right(
           "" -> Round(
             1,
-            SanMove.PawnMove(Position('e', '4'), Check.NoCheck, None),
+            SanMove
+              .PawnMove(Position(File('e'), Rank('4')), Check.NoCheck, None),
             Some(
-              SanMove.PawnMove(Position('e', '6'), Check.NoCheck, None)
+              SanMove.PawnMove(
+                Position(File('e'), Rank('6')),
+                Check.NoCheck,
+                None
+              )
             )
           )
         )
@@ -47,14 +52,18 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             1,
             SanMove.FigureMove(
               Figure.Knight,
-              Position('f', '3'),
+              Position(File('f'), Rank('3')),
               Check.NoCheck,
               None,
               None,
               isCapture = false
             ),
             Some(
-              SanMove.PawnMove(Position('e', '6'), Check.NoCheck, None)
+              SanMove.PawnMove(
+                Position(File('e'), Rank('6')),
+                Check.NoCheck,
+                None
+              )
             )
           )
         )
@@ -70,13 +79,19 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             1,
             SanMove.FigureMove(
               Figure.Rook,
-              Position('c', '1'),
+              Position(File('c'), Rank('1')),
               Check.NoCheck,
               None,
-              Some('a'),
+              Some(File('a')),
               isCapture = false
             ),
-            Some(SanMove.PawnMove(Position('e', '6'), Check.NoCheck, None))
+            Some(
+              SanMove.PawnMove(
+                Position(File('e'), Rank('6')),
+                Check.NoCheck,
+                None
+              )
+            )
           )
         )
       )
@@ -91,7 +106,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             36,
             SanMove.FigureMove(
               Figure.Rook,
-              Position('a', '6'),
+              Position(File('a'), Rank('6')),
               Check.SimpleCheck,
               None,
               None,
@@ -100,7 +115,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             Some(
               SanMove.FigureMove(
                 Figure.King,
-                Position('c', '5'),
+                Position(File('c'), Rank('5')),
                 Check.NoCheck,
                 None,
                 None,
@@ -121,7 +136,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             36,
             SanMove.FigureMove(
               Figure.Rook,
-              Position('a', '6'),
+              Position(File('a'), Rank('6')),
               Check.NoCheck,
               None,
               None,
@@ -130,7 +145,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             Some(
               SanMove.FigureMove(
                 Figure.King,
-                Position('c', '5'),
+                Position(File('c'), Rank('5')),
                 Check.Checkmate,
                 None,
                 None,
@@ -151,7 +166,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             36,
             SanMove.FigureMove(
               Figure.Rook,
-              Position('a', '6'),
+              Position(File('a'), Rank('6')),
               Check.NoCheck,
               None,
               None,
@@ -172,7 +187,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             19,
             SanMove.FigureMove(
               Figure.Bishop,
-              Position('f', '3'),
+              Position(File('f'), Rank('3')),
               Check.NoCheck,
               None,
               None,
@@ -192,8 +207,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
           "" -> Round(
             19,
             SanMove.PawnCapture(
-              Position('f', '3'),
-              'c',
+              Position(File('f'), Rank('3')),
+              File('c'),
               Check.NoCheck,
               None
             ),
@@ -211,7 +226,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
           "" -> Round(
             19,
             SanMove.PawnMove(
-              Position('a', '1'),
+              Position(File('a'), Rank('1')),
               Check.NoCheck,
               Some(Figure.Queen)
             ),
@@ -230,7 +245,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             9,
             SanMove.FigureMove(
               Figure.Bishop,
-              Position('c', '6'),
+              Position(File('c'), Rank('6')),
               Check.SimpleCheck,
               None,
               None,
@@ -250,7 +265,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
           "" -> Round(
             19,
             SanMove.PawnMove(
-              Position('a', '1'),
+              Position(File('a'), Rank('1')),
               Check.SimpleCheck,
               Some(Figure.Queen)
             ),
@@ -332,8 +347,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
           "" -> Round(
             19,
             SanMove.PawnCapture(
-              Position('b', '8'),
-              'a',
+              Position(File('b'), Rank('8')),
+              File('a'),
               Check.NoCheck,
               Some(Figure.Queen)
             ),
@@ -351,8 +366,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
           "" -> Round(
             19,
             SanMove.PawnCapture(
-              Position('b', '8'),
-              'a',
+              Position(File('b'), Rank('8')),
+              File('a'),
               Check.Checkmate,
               Some(Figure.Queen)
             ),
@@ -376,13 +391,13 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             Round(
               1,
               SanMove.PawnMove(
-                Position('d', '4'),
+                Position(File('d'), Rank('4')),
                 Check.NoCheck,
                 None
               ),
               Some(
                 SanMove.PawnMove(
-                  Position('d', '5'),
+                  Position(File('d'), Rank('5')),
                   Check.NoCheck,
                   None
                 )
@@ -391,13 +406,13 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             Round(
               2,
               SanMove.PawnMove(
-                Position('f', '4'),
+                Position(File('f'), Rank('4')),
                 Check.NoCheck,
                 None
               ),
               Some(
                 SanMove.PawnMove(
-                  Position('e', '6'),
+                  Position(File('e'), Rank('6')),
                   Check.NoCheck,
                   None
                 )
@@ -407,7 +422,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
               3,
               SanMove.FigureMove(
                 Figure.Knight,
-                Position('f', '4'),
+                Position(File('f'), Rank('4')),
                 Check.NoCheck,
                 None,
                 None,
@@ -415,7 +430,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
               ),
               Some(
                 SanMove.PawnMove(
-                  Position('g', '6'),
+                  Position(File('g'), Rank('6')),
                   Check.NoCheck,
                   None
                 )
@@ -435,13 +450,13 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
             Round(
               1,
               SanMove.PawnMove(
-                Position('d', '4'),
+                Position(File('d'), Rank('4')),
                 Check.NoCheck,
                 None
               ),
               Some(
                 SanMove.PawnMove(
-                  Position('d', '5'),
+                  Position(File('d'), Rank('5')),
                   Check.NoCheck,
                   None
                 )
@@ -460,7 +475,8 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
           "" -> (List(
             Round(
               12,
-              SanMove.PawnMove(Position('d', '4'), Check.NoCheck, None),
+              SanMove
+                .PawnMove(Position(File('d'), Rank('4')), Check.NoCheck, None),
               None
             )
           ) -> (GameResult.BlackWins: GameResult))

@@ -75,19 +75,19 @@ object PgnReaderTest extends TestSuite {
       assert(boardAfter == expected)
     }
 
-    // val games: List[String] = loadGames
+    val games: List[String] = loadGames
 
-    // "parse successfully 10k games" - {
-    //   games.zipWithIndex.foreach { case (pgnGame, idx) =>
-    //     val res = new PgnReader().read(pgnGame)
-    //     res match {
-    //       case Left(value) =>
-    //         println(s"Game $idx failed to parse with error: $value")
-    //         assert(false)
-    //       case Right(_) => // noop
-    //     }
-    //   }
-    // }
+    "parse successfully 10k games" - {
+      games.zipWithIndex.foreach { case (pgnGame, idx) =>
+        val res = new PgnReader().read(pgnGame)
+        res match {
+          case Left(value) =>
+            println(s"Game $idx failed to parse with error: $value")
+            assert(false)
+          case Right(_) => // noop
+        }
+      }
+    }
   }
 
   private def loadGames = { //TODO deduplicate

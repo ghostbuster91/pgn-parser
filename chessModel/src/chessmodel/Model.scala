@@ -42,30 +42,28 @@ case class Move(from: Coordinate, to: Coordinate, peace: PlayerPeace)
 object Board {
 
   private val Whites =
-    pawns(1, Player.White) ++ figures(0, Player.White)
+    pawns(Row(1), Player.White) ++ figures(Row(0), Player.White)
   private val Blacks =
-    pawns(6, Player.Black) ++ figures(7, Player.Black)
+    pawns(Row(6), Player.Black) ++ figures(Row(7), Player.Black)
   val Starting: Board = Board(Whites ++ Blacks)
 
-  private def pawns(row: Int, player: Player) = (0 until 8)
-    .map(col =>
-      Coordinate(Column(row), Row(col)) -> PlayerPeace(Peace.Pawn, player)
-    )
+  private def pawns(row: Row, player: Player) = (0 until 8)
+    .map(col => Coordinate(Column(col), row) -> PlayerPeace(Peace.Pawn, player))
     .toMap
 
   private def figures(
-      row: Int,
+      row: Row,
       player: Player
   ): Map[Coordinate, PlayerPeace] = {
     Map(
-      Coordinate(Column(row), Row(0)) -> Figure.Rook,
-      Coordinate(Column(row), Row(1)) -> Figure.Knight,
-      Coordinate(Column(row), Row(2)) -> Figure.Bishop,
-      Coordinate(Column(row), Row(3)) -> Figure.Queen,
-      Coordinate(Column(row), Row(4)) -> Figure.King,
-      Coordinate(Column(row), Row(5)) -> Figure.Bishop,
-      Coordinate(Column(row), Row(6)) -> Figure.Knight,
-      Coordinate(Column(row), Row(7)) -> Figure.Rook
+      Coordinate(Column(0), row) -> Figure.Rook,
+      Coordinate(Column(1), row) -> Figure.Knight,
+      Coordinate(Column(2), row) -> Figure.Bishop,
+      Coordinate(Column(3), row) -> Figure.Queen,
+      Coordinate(Column(4), row) -> Figure.King,
+      Coordinate(Column(5), row) -> Figure.Bishop,
+      Coordinate(Column(6), row) -> Figure.Knight,
+      Coordinate(Column(7), row) -> Figure.Rook
     ).view.mapValues(f => PlayerPeace(f, player)).toMap
   }
 }

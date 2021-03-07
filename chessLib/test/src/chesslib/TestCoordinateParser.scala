@@ -12,7 +12,7 @@ object TestCoordinateParser {
     val rows = expectations.split('\n').zipWithIndex
     val expectationMatrix = rows.flatMap { case (textRow, rowId) =>
       textRow.zipWithIndex.map { case (square, colId) =>
-        Coordinate(Column(7 - rowId), Row(colId)) -> (square == 'X')
+        Coordinate(Column(colId), Row(7 - rowId)) -> (square == 'X')
       }
     }.toMap
     expectationMatrix
@@ -22,7 +22,7 @@ object TestCoordinateParser {
     val board = rows
       .flatMap { case (textRow, rowId) =>
         textRow.zipWithIndex.map { case (square, colId) =>
-          Coordinate(Column(7 - rowId), Row(colId)) -> (square match {
+          Coordinate(Column(colId), Row(7 - rowId)) -> (square match {
             case 'Q' => Some(PlayerPeace(Figure.Queen, Player.White))
             case 'K' => Some(PlayerPeace(Figure.King, Player.White))
             case 'B' => Some(PlayerPeace(Figure.Bishop, Player.White))

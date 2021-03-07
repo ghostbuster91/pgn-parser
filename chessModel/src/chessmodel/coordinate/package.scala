@@ -1,8 +1,8 @@
 package chessmodel
 
-import io.estatico.newtype.macros.newtype
+import io.estatico.newtype.macros.newsubtype
 
 package object coordinate {
-  @newtype case class Column(v: Int)
-  @newtype case class Row(v: Int)
+  @newsubtype case class Column(v: Int)
+  @newsubtype case class Row(v: Int)
 }

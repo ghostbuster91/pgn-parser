@@ -33,7 +33,7 @@ object Engine {
       case Player.White => Direction.North
     }
     val isOneSquareFrom =
-      from.col == to.col && from.row == to.row.v - pawnDirection.shift.rowInc
+      from.col == to.col && from.row == to.row - pawnDirection.shift.rowInc
     val pawnRow = currentPlayer match {
       case Player.Black => 6
       case Player.White => 1
@@ -57,7 +57,7 @@ object Engine {
       case Player.Black => Direction.South
       case Player.White => Direction.North
     }
-    from.row == to.row.v - pawnDirection.shift.rowInc
+    from.row == to.row - pawnDirection.shift.rowInc
   }
 
   private def isEligibleToMoveKingRule(
@@ -106,21 +106,21 @@ object Engine {
     val cCandidates = (-7) until 8
     // y = x + c
     val positive = cCandidates.exists { c =>
-      from.row.v == from.col.v + c && to.row.v == to.col.v + c
+      from.row == from.col + c && to.row == to.col + c
     }
     // y = -x +c
     val negative = cCandidates.map(_ + 7).exists { c =>
-      from.row.v == -from.col.v + c && to.row == -to.col.v + c
+      from.row == -from.col + c && to.row == -to.col + c
     }
     if (positive || negative) {
       val dir = if (positive) {
-        if (from.col.v < to.col.v) {
+        if (from.col < to.col) {
           Direction.NorthEast
         } else {
           Direction.SouthWest
         }
       } else if (negative) {
-        if (from.col.v < to.col.v) {
+        if (from.col < to.col) {
           Direction.SouthEast
         } else {
           Direction.NorthWest
@@ -167,15 +167,15 @@ object Engine {
       board: Board
   ): Boolean = {
     if (from.col == to.col) {
-      val squares = ((Math.min(from.row.v, to.row.v) + 1) until Math.max(
-        from.row.v,
-        to.row.v
+      val squares = ((Math.min(from.row, to.row) + 1) until Math.max(
+        from.row,
+        to.row
       )).map(row => Coordinate(Column(row), from.col))
       noFiguresAt(squares, board)
     } else if (from.row == to.row) {
-      val squares = ((Math.min(from.col.v, to.col.v) + 1) until Math.max(
-        from.col.v,
-        to.col.v
+      val squares = ((Math.min(from.col, to.col) + 1) until Math.max(
+        from.col,
+        to.col
       )).map(col => Coordinate(from.row, Row(col)))
       noFiguresAt(squares, board)
     } else {

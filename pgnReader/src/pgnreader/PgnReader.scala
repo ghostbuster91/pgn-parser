@@ -83,25 +83,7 @@ class PgnReader extends Reader {
   ): Coordinate = {
     board.peaces
       .collect { case (c, PlayerPeace(Peace.Pawn, `currentPlayer`)) => c }
-      .find { src =>
-        val pawnDirection = currentPlayer match {
-          case Player.Black => Direction.South
-          case Player.White => Direction.North
-        }
-        val isOneSquareFrom =
-          src.col == dest.col && src.row == dest.row - pawnDirection.shift.rowInc
-        val pawnRow = currentPlayer match {
-          case Player.Black => 6
-          case Player.White => 1
-        }
-        val pawnRowHop = pawnRow + 2 * pawnDirection.shift.rowInc
-        val nextSquare = src.shift(pawnDirection.shift).get //TODO
-        val isJump = (src.col == dest.col &&
-          src.row == pawnRow &&
-          dest.row == pawnRowHop &&
-          board.getSquare(nextSquare).isEmpty)
-        isOneSquareFrom || isJump
-      }
+      .find(src => Engine.isPawnEligibleToMove(src, dest, board, currentPlayer))
       .getOrElse(
         throw new RuntimeException(
           s"Couldn't find a pawn to move to ${Position.fromCoord(dest)} by ${currentPlayer}"
@@ -116,16 +98,18 @@ class PgnReader extends Reader {
       sourceCol: Char
   ): Coordinate = {
     board.peaces
-      .collect { case (coord, PlayerPeace(Peace.Pawn, currentPlayer)) =>
-        coord
+      .collect {
+        case (coord, PlayerPeace(Peace.Pawn, currentPlayer))
+            if coord.col == columnToInt(sourceCol) =>
+          coord
       }
       .find { source =>
-        val pawnDirection = currentPlayer match {
-          case Player.Black => Direction.South
-          case Player.White => Direction.North
-        }
-        (source.row == dest.row - pawnDirection.shift.rowInc) &&
-        (source.col == columnToInt(sourceCol))
+        Engine.isPawnEligibleToCapture(
+          source,
+          dest,
+          board,
+          currentPlayer
+        )
       }
       .getOrElse(
         throw new RuntimeException(

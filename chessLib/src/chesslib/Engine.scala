@@ -21,6 +21,57 @@ object Engine {
     }
   }
 
+  def isPawnEligibleToMove(
+      from: Coordinate,
+      to: Coordinate,
+      board: Board,
+      currentPlayer: Player
+  ): Boolean = {
+    val pawnDirection = currentPlayer match {
+      case Player.Black => Direction.South
+      case Player.White => Direction.North
+    }
+    val isOneSquareFrom =
+      from.col == to.col && from.row == to.row - pawnDirection.shift.rowInc
+    val pawnRow = currentPlayer match {
+      case Player.Black => 6
+      case Player.White => 1
+    }
+    val pawnRowHop = pawnRow + 2 * pawnDirection.shift.rowInc
+    val nextSquare = from.shift(pawnDirection.shift).get //TODO
+    val isJump = (from.col == to.col &&
+      from.row == pawnRow &&
+      to.row == pawnRowHop &&
+      board.getSquare(nextSquare).isEmpty)
+    isOneSquareFrom || isJump
+  }
+
+  def isPawnEligibleToCapture(
+      from: Coordinate,
+      to: Coordinate,
+      board: Board,
+      currentPlayer: Player
+  ): Boolean = {
+    val pawnDirection = currentPlayer match {
+      case Player.Black => Direction.South
+      case Player.White => Direction.North
+    }
+    from.row == to.row - pawnDirection.shift.rowInc
+  }
+
+  private def columnToInt(char: Char): Int = { //TODO create proper type for column
+    char match {
+      case 'a' => 0
+      case 'b' => 1
+      case 'c' => 2
+      case 'd' => 3
+      case 'e' => 4
+      case 'f' => 5
+      case 'g' => 6
+      case 'h' => 7
+    }
+  }
+
   private def isEligibleToMoveKingRule(
       board: Board,
       currentPlayer: Player

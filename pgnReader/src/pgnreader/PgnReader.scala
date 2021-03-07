@@ -13,37 +13,53 @@ import chessmodel.Player.Black
 import chessmodel.Player.White
 import chessmodel.coordinate._
 import chessmodel.position._
+import java.text.ParseException
 
 class PgnReader extends Reader {
   def read(pgnString: String): Either[ParsingException, ChessGame] = {
     val result = PgnParser.pgnGame.parseAll(pgnString)
-    result match {
-      case Left(value) =>
-        Left(
-          ParsingException(
-            s"${value.failedAtOffset} ${value.expected.map(_.toString()).mkString_(", ")}"
-          )
+    for {
+      pgnGame <- parseAsSan(pgnString)
+      result <- convertToLan(pgnGame)
+    } yield result
+  }
+
+  private def parseAsSan(pgnString: String) = {
+    PgnParser.pgnGame
+      .parseAll(pgnString)
+      .left
+      .map(value =>
+        ParsingException(
+          s"${value.failedAtOffset} ${value.expected.map(_.toString()).mkString_(", ")}"
         )
-      case Right(pgnGame) =>
-        val pgnMoves = pgnGame.rounds
-          .flatMap(r => List(r.firstMove) ++ r.secondMove)
-        Right(pgnMoves.foldLeft(ChessGame.Starting) { case (game, sanMove) =>
-          val lanMove = toLanMove(game, sanMove)
-          game.move(lanMove)
-        })
+      )
+  }
+
+  private def convertToLan(result: PgnGame) = {
+    val pgnMoves = result.rounds
+      .flatMap(r => List(r.firstMove) ++ r.secondMove)
+    pgnMoves.foldLeft(ChessGame.Starting.asRight[ParsingException]) {
+      case (Right(game), sanMove) =>
+        val lanMove = toLanMove(game, sanMove) //TODO to either
+        lanMove match {
+          case Left(value)  => Left(ParsingException(value))
+          case Right(value) => Right(game.move(value))
+        }
+      case (Left(error), _) => Left(error)
     }
   }
 
   def toLanMove(
       game: ChessGame,
       sanMove: SanMove
-  ): LanMove = {
+  ): Either[String, LanMove] = {
     sanMove match {
-      case spm: SanMove.PawnMove          => handlePawnMove(spm, game)
-      case sfm: SanMove.FigureMove        => handleFigureMove(sfm, game)
-      case spc: SanMove.PawnCapture       => handlePawnCapture(spc, game)
-      case SanMove.QueenSideCastle(check) => LanMove.QueenSideCastle(check)
-      case SanMove.KingSideCastle(check)  => LanMove.KingSideCastle(check)
+      case spm: SanMove.PawnMove    => Right(handlePawnMove(spm, game))
+      case sfm: SanMove.FigureMove  => handleFigureMove(sfm, game)
+      case spc: SanMove.PawnCapture => Right(handlePawnCapture(spc, game))
+      case SanMove.QueenSideCastle(check) =>
+        Right(LanMove.QueenSideCastle(check))
+      case SanMove.KingSideCastle(check) => Right(LanMove.KingSideCastle(check))
     }
   }
 
@@ -124,15 +140,17 @@ class PgnReader extends Reader {
   private def handleFigureMove(
       sanMove: SanMove.FigureMove,
       game: ChessGame
-  ): LanMove.FigureMove = {
+  ): Either[String, LanMove.FigureMove] = {
     (sanMove.sourceCol, sanMove.sourceRow) match {
       case (Some(srcCol), Some(srcRow)) =>
-        LanMove.FigureMove(
-          sanMove.figure,
-          sanMove.destitnation,
-          sanMove.check,
-          Position(srcCol, srcRow),
-          isCapture = sanMove.isCapture
+        Right(
+          LanMove.FigureMove(
+            sanMove.figure,
+            sanMove.destitnation,
+            sanMove.check,
+            Position(srcCol, srcRow),
+            isCapture = sanMove.isCapture
+          )
         )
       case (Some(srcCol), None) =>
         handleFigureMoveGeneric(game, sanMove) {
@@ -170,15 +188,17 @@ class PgnReader extends Reader {
   ) = {
     candidates match {
       case coord :: Nil =>
-        LanMove.FigureMove(
-          sanMove.figure,
-          sanMove.destitnation,
-          sanMove.check,
-          Position.fromCoord(coord),
-          sanMove.isCapture
+        Right(
+          LanMove.FigureMove(
+            sanMove.figure,
+            sanMove.destitnation,
+            sanMove.check,
+            Position.fromCoord(coord),
+            sanMove.isCapture
+          )
         )
       case multiple @ _ :: _ => handleAmbigiousMove(game, sanMove, multiple)
-      case Nil               => throw new RuntimeException("No figures to move")
+      case Nil               => Left("No figures to move")
     }
   }
 
@@ -206,10 +226,15 @@ class PgnReader extends Reader {
           isCapture = sanMove.isCapture
         )
       } match {
-      case head :: Nil => head
+      case head :: Nil => Right(head)
       case multiple @ _ :: _ =>
-        throw new RuntimeException("Multiple ambigious figures to move")
-      case Nil => throw new RuntimeException("No eligible figures to move")
+        Left(
+          s"Multiple ambigious ${sanMove.figure} to move to ${sanMove.destitnation}"
+        )
+      case Nil =>
+        Left(
+          s"No eligible ${sanMove.figure} to move to ${sanMove.destitnation}"
+        )
     }
   }
 }

@@ -10,5 +10,25 @@ object PgnReaderTest extends TestSuite {
 
       println(new PgnReader().read(input))
     }
+    val games: List[String] = loadGames
+
+    "parse successfully 10k games" - {
+      games.zipWithIndex.foreach { case (pgnGame, idx) =>
+        val res = new PgnReader().read(pgnGame)
+        res match {
+          case Left(value) =>
+            println(s"Game $idx failed to parse with error: $value")
+            assert(false)
+          case Right(_) => // noop
+        }
+      }
+    }
+  }
+
+  private def loadGames = {
+    val source =
+      scala.io.Source.fromResource("lichess_db_10k_lines_stripped_2020-12.pgn")
+    try source.getLines().toList
+    finally source.close()
   }
 }

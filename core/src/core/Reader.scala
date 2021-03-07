@@ -7,7 +7,7 @@ trait Reader {
   def read(game: String): Either[ParsingException, ChessGame]
 }
 
-case class ParsingException(reason: String) extends RuntimeException
+case class ParsingException(reason: String) extends RuntimeException(reason)
 
 case class ChessGame(
     board: Board,

@@ -8,8 +8,8 @@ import chessmodel._
 import chessmodel.position._
 
 trait DiffSemiSupport {
-  implicit val dFile = Diff.derived[File]
-  implicit val dRank = Diff.derived[Rank]
+  implicit val dFile = Diff.useEquals[File]
+  implicit val dRank = Diff.useEquals[Rank]
   implicit val dPos = Diff.derived[Position]
   implicit val dCheck = Diff.derived[Check]
   implicit val dFigure = Diff.derived[Figure]

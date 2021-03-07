@@ -218,7 +218,7 @@ class PgnReader extends Reader {
         )
       } match {
       case head :: Nil => Right(head)
-      case multiple @ _ :: _ =>
+      case _ :: _ =>
         Left(
           s"Multiple ambigious ${sanMove.figure} to move to ${sanMove.destitnation}"
         )

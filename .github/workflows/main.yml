@@ -14,5 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: coursier/cache-action@v5
       - name: Run tests
         run: ./mill _.test

@@ -8,24 +8,18 @@ import core.ParsingException
 import cats.syntax.all._
 import chessmodel._
 import chesslib._
-import scala.collection.immutable
-import chessmodel.Player.Black
-import chessmodel.Player.White
 import chessmodel.coordinate._
 import chessmodel.position._
-import java.text.ParseException
 
 class PgnReader extends Reader {
 
-  def read(pgnString: String): Either[ParsingException, ChessGame] = {
-    val result = PgnParser.pgnGame.parseAll(pgnString)
+  def read(pgnString: String): Either[ParsingException, ChessGame] =
     for {
       pgnGame <- parseAsSan(pgnString)
       result <- convertToLan(pgnGame)
     } yield result
-  }
 
-  private def parseAsSan(pgnString: String) = {
+  private def parseAsSan(pgnString: String) =
     PgnParser.pgnGame
       .parseAll(pgnString)
       .left
@@ -34,7 +28,6 @@ class PgnReader extends Reader {
           s"${value.failedAtOffset} ${value.expected.map(_.toString()).mkString_(", ")}"
         )
       )
-  }
 
   private def convertToLan(result: PgnGame) = {
     val pgnMoves = result.rounds
@@ -56,7 +49,7 @@ class PgnReader extends Reader {
   private def toLanMove(
       game: ChessGame,
       sanMove: SanMove
-  ): Either[String, LanMove] = {
+  ): Either[String, LanMove] =
     sanMove match {
       case spm: SanMove.PawnMove    => Right(handlePawnMove(spm, game))
       case sfm: SanMove.FigureMove  => handleFigureMove(sfm, game)
@@ -65,7 +58,6 @@ class PgnReader extends Reader {
         Right(LanMove.QueenSideCastle(check))
       case SanMove.KingSideCastle(check) => Right(LanMove.KingSideCastle(check))
     }
-  }
 
   private def handlePawnMove(sanMove: SanMove.PawnMove, game: ChessGame) = {
     val coordDest = sanMove.destitnation.toCoord()
@@ -102,26 +94,25 @@ class PgnReader extends Reader {
       board: Board,
       dest: Coordinate,
       currentPlayer: Player
-  ): Coordinate = {
+  ): Coordinate =
     board.peaces
       .collect { case (c, PlayerPeace(Peace.Pawn, `currentPlayer`)) => c }
       .find(src => Engine.isPawnEligibleToMove(src, dest, board, currentPlayer))
       .getOrElse(
         throw new RuntimeException(
-          s"Couldn't find a pawn to move to ${Position.fromCoord(dest)} by ${currentPlayer}"
+          s"Couldn't find a pawn to move to ${Position.fromCoord(dest)} by $currentPlayer"
         )
       )
-  }
 
   private def findPawnCaptureSource(
       board: Board,
       dest: Coordinate,
       currentPlayer: Player,
       source: File
-  ): Coordinate = {
+  ): Coordinate =
     board.peaces
       .collect {
-        case (coord, PlayerPeace(Peace.Pawn, currentPlayer))
+        case (coord, PlayerPeace(Peace.Pawn, `currentPlayer`))
             if coord.col == source.toColumn =>
           coord
       }
@@ -129,22 +120,20 @@ class PgnReader extends Reader {
         Engine.isPawnEligibleToCapture(
           source,
           dest,
-          board,
           currentPlayer
         )
       }
       .getOrElse(
         throw new RuntimeException(
           s"Couldn't find a pawn to capture on ${Position
-            .fromCoord(dest)} by ${currentPlayer} from ${source}"
+            .fromCoord(dest)} by $currentPlayer from $source"
         )
       )
-  }
 
   private def handleFigureMove(
       sanMove: SanMove.FigureMove,
       game: ChessGame
-  ): Either[String, LanMove.FigureMove] = {
+  ): Either[String, LanMove.FigureMove] =
     (sanMove.sourceCol, sanMove.sourceRow) match {
       case (Some(srcCol), Some(srcRow)) =>
         Right(
@@ -173,7 +162,6 @@ class PgnReader extends Reader {
           case (c, PlayerPeace(sanMove.figure, game.currentPlayer)) => c
         }
     }
-  }
 
   private def handleFigureMoveGeneric(
       game: ChessGame,
@@ -189,7 +177,7 @@ class PgnReader extends Reader {
       game: ChessGame,
       sanMove: SanMove.FigureMove,
       candidates: List[Coordinate]
-  ) = {
+  ) =
     candidates match {
       case coord :: Nil =>
         Right(
@@ -204,13 +192,12 @@ class PgnReader extends Reader {
       case multiple @ _ :: _ => handleAmbigiousMove(game, sanMove, multiple)
       case Nil               => Left("No figures to move")
     }
-  }
 
   private def handleAmbigiousMove(
       game: ChessGame,
       sanMove: SanMove.FigureMove,
       candidates: List[Coordinate]
-  ) = {
+  ) =
     candidates
       .filter { coord =>
         Engine.isEligibleToMove(
@@ -240,5 +227,4 @@ class PgnReader extends Reader {
           s"No eligible ${sanMove.figure} to move to ${sanMove.destitnation} by ${game.currentPlayer}"
         )
     }
-  }
 }

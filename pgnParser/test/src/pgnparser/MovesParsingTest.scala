@@ -3,10 +3,6 @@ package pgnparser
 import utest._
 import PgnParser._
 import com.softwaremill.diffx.utest.DiffxAssertions._
-import cats.parse.Parser.Error
-import cats.parse.Parser.Expectation
-import com.softwaremill.diffx._
-import com.softwaremill.diffx.cats._
 import chessmodel._
 import chessmodel.position._
 

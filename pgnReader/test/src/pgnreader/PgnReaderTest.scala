@@ -114,11 +114,10 @@ object PgnReaderTest extends TestSuite {
   }
 
   implicit class RichEither[L <: Exception, R](e: Either[L, R]) {
-    def unwrap(): R = {
+    def unwrap(): R =
       e match {
         case Left(value)  => throw value
         case Right(value) => value
       }
-    }
   }
 }

@@ -1,6 +1,6 @@
 package pgnparser
 
-import cats.parse.{Parser => P, Parser1 => P1, _}
+import cats.parse.{Parser => P}
 import cats.syntax.all._
 import chessmodel._
 import chessmodel.position._

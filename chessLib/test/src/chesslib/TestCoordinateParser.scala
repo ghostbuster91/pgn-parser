@@ -3,9 +3,6 @@ package chesslib
 import chessmodel.Board
 import chessmodel.coordinate._
 import chessmodel.PlayerPeace
-import chessmodel.Figure
-import chessmodel.Peace
-import chessmodel.Player
 
 object TestCoordinateParser {
   def parseExp(expectations: String): Map[Coordinate, Boolean] = {

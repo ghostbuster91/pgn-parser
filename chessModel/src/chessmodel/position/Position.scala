@@ -3,9 +3,8 @@ package chessmodel.position
 import chessmodel.coordinate._
 
 case class Position(file: File, rank: Rank) {
-  def toCoord(): Coordinate = {
+  def toCoord(): Coordinate =
     Coordinate(file.toColumn, rank.toRow)
-  }
 }
 object Position {
   def fromCoord(coord: Coordinate): Position = {

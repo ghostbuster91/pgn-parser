@@ -52,20 +52,22 @@ object ElegibleMoveTest extends TestSuite {
     val matrix = TestCoordinateParser.parseExp(strMatrix.stripMargin)
     val board = TestCoordinateParser.parseBoard(strBoard.stripMargin)
     matrix.foreach { case (coord, expected) =>
-      val figure =
-        board.getSquare(lp.position.toCoord()).get.peace.asInstanceOf[Figure]
-      val result =
-        Engine.isEligibleToMove(
-          lp.position.toCoord(),
-          coord,
-          board,
-          figure,
-          lp.player
-        )
-      Predef.assert(
-        result == expected,
-        s"${Position.fromCoord(coord)} expected: $expected"
-      )
+      board.getSquare(lp.position.toCoord()).get.peace match {
+        case figure: Figure =>
+          val result =
+            Engine.isEligibleToMove(
+              lp.position.toCoord(),
+              coord,
+              board,
+              figure,
+              lp.player
+            )
+          Predef.assert(
+            result == expected,
+            s"${Position.fromCoord(coord)} expected: $expected"
+          )
+        case Peace.Pawn => //TODO
+      }
     }
   }
   case class LocatedPeace(position: Position, player: Player)

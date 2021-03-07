@@ -15,15 +15,14 @@ case class ChessGame(
     currentPlayer: Player,
     previousState: Option[(ChessGame, LanMove)]
 ) {
-  def move(move: LanMove): ChessGame = {
+  def move(move: LanMove): ChessGame =
     ChessGame(
       board.move(lanMoveToMove(move)),
       currentPlayer.opponent,
       Some(this -> move)
     )
-  }
 
-  private def lanMoveToMove(lan: LanMove): List[Transformation] = {
+  private def lanMoveToMove(lan: LanMove): List[Transformation] =
     lan match {
       case LanMove.FigureMove(figure, destitnation, check, source, _) =>
         List(
@@ -74,9 +73,8 @@ case class ChessGame(
           case Player.White => kingSideCastle(Rank('1'))
         }
     }
-  }
 
-  private def queenSideCastle(row: Rank) = {
+  private def queenSideCastle(row: Rank) =
     List(
       Transformation.Move(
         Position(File('e'), row).toCoord(),
@@ -89,9 +87,8 @@ case class ChessGame(
         PlayerPeace(Figure.Rook, currentPlayer)
       )
     )
-  }
 
-  private def kingSideCastle(row: Rank) = {
+  private def kingSideCastle(row: Rank) =
     List(
       Transformation.Move(
         Position(File('e'), row).toCoord(),
@@ -104,7 +101,6 @@ case class ChessGame(
         PlayerPeace(Figure.Rook, currentPlayer)
       )
     )
-  }
 }
 
 object ChessGame {

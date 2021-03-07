@@ -2,7 +2,6 @@ package chesslib
 
 import utest._
 import chessmodel._
-import TestCoordinateParser._
 import chessmodel.position._
 
 object ThreatDetectorTest extends TestSuite {

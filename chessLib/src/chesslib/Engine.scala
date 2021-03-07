@@ -56,7 +56,6 @@ object Engine {
   def isPawnEligibleToCapture(
       from: Coordinate,
       to: Coordinate,
-      board: Board,
       currentPlayer: Player
   ): Boolean = {
     val pawnDirection = currentPlayer match {
@@ -76,7 +75,7 @@ object Engine {
       }
       .getOrElse(
         throw new RuntimeException(
-          s"Couldn't find ${currentPlayer}'s king on board"
+          s"Couldn't find $currentPlayer's king on board"
         )
       )
     !isSquareCheckedBy(kingLocation, board, currentPlayer.opponent)
@@ -147,11 +146,10 @@ object Engine {
       coord: Coordinate,
       board: Board,
       currentPlayer: Player
-  ): Boolean = {
+  ): Boolean =
     board
       .getSquare(coord)
       .forall(pp => pp.player == currentPlayer.opponent)
-  }
 
   private def noFiguresAt(
       squares: Iterable[Coordinate],
@@ -162,15 +160,14 @@ object Engine {
   private def isKnightEligibleToMove(
       from: Coordinate,
       to: Coordinate
-  ): Boolean = {
+  ): Boolean =
     getPossibleKnightMoves(from)
       .contains(to)
-  }
   private def isRookEligibleToMove(
       from: Coordinate,
       to: Coordinate,
       board: Board
-  ): Boolean = {
+  ): Boolean =
     if (from.col == to.col) {
       val squares = ((Math.min(from.row, to.row) + 1) until Math.max(
         from.row,
@@ -186,7 +183,6 @@ object Engine {
     } else {
       false
     }
-  }
 
   def isSquareCheckedBy(
       target: Coordinate,
@@ -251,13 +247,19 @@ object Engine {
   }
 
   private def isBishopThreat(direction: Direction) =
-    direction.isInstanceOf[Direction.Diagonal]
+    direction match {
+      case _: Direction.Diagonal => true
+      case _                     => false
+    }
 
   private def isRookThreat(direction: Direction) =
-    direction.isInstanceOf[Direction.File] ||
-      direction.isInstanceOf[Direction.Rank]
+    direction match {
+      case _: Direction.Rank => true
+      case _: Direction.File => true
+      case _                 => false
+    }
 
-  private def isPawnThreat(direction: Direction, opponent: Player) = {
+  private def isPawnThreat(direction: Direction, opponent: Player) =
     opponent match {
       case Player.Black =>
         direction match {
@@ -272,7 +274,6 @@ object Engine {
           case _                   => false
         }
     }
-  }
 
   type Distance = Int
 
@@ -281,7 +282,7 @@ object Engine {
       board: Board,
       direction: Direction,
       distance: Distance = 1
-  ): Option[(Distance, PlayerPeace)] = {
+  ): Option[(Distance, PlayerPeace)] =
     if (distance <= 8) {
       coords
         .shift(direction.shift)
@@ -294,5 +295,4 @@ object Engine {
     } else {
       Option.empty
     }
-  }
 }

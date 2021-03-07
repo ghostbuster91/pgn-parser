@@ -5,7 +5,7 @@ import chessmodel.coordinate._
 
 package object position {
   @newtype case class File(v: Char) {
-    def toColumn: Column = {
+    def toColumn: Column =
       Column(v match {
         case 'a' => 0
         case 'b' => 1
@@ -16,10 +16,9 @@ package object position {
         case 'g' => 6
         case 'h' => 7
       })
-    }
   }
   object File {
-    def fromColumn(c: Column): File = {
+    def fromColumn(c: Column): File =
       File(c match {
         case 0 => 'a'
         case 1 => 'b'
@@ -30,10 +29,9 @@ package object position {
         case 6 => 'g'
         case 7 => 'h'
       })
-    }
   }
   @newtype case class Rank(v: Char) {
-    def toRow: Row = {
+    def toRow: Row =
       Row(v match {
         case '1' => 0
         case '2' => 1
@@ -44,10 +42,9 @@ package object position {
         case '7' => 6
         case '8' => 7
       })
-    }
   }
   object Rank {
-    def fromRow(r: Row): Rank = {
+    def fromRow(r: Row): Rank =
       Rank(r match {
         case 0 => '1'
         case 1 => '2'
@@ -58,6 +55,5 @@ package object position {
         case 6 => '7'
         case 7 => '8'
       })
-    }
   }
 }

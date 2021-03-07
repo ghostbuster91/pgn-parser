@@ -60,7 +60,7 @@ case class PlayerPeace(peace: Peace, player: Player) {
   def asChar = peace.asChar(player)
 }
 object PlayerPeace {
-  def fromChar(square: Char): Option[PlayerPeace] = {
+  def fromChar(square: Char): Option[PlayerPeace] =
     square match {
       case 'Q' => Some(PlayerPeace(Figure.Queen, Player.White))
       case 'K' => Some(PlayerPeace(Figure.King, Player.White))
@@ -76,7 +76,6 @@ object PlayerPeace {
       case 'n' => Some(PlayerPeace(Figure.Knight, Player.Black))
       case _   => None
     }
-  }
 }
 
 case class Board(peaces: Map[Coordinate, PlayerPeace]) {
@@ -86,16 +85,15 @@ case class Board(peaces: Map[Coordinate, PlayerPeace]) {
       acc.move(item)
   }
 
-  def move(t: Transformation): Board = {
+  def move(t: Transformation): Board =
     t match {
       case r: Transformation.Remove =>
         copy(peaces = peaces - r.from)
       case m: Transformation.Move =>
         copy(peaces = peaces - m.from + (m.to -> m.peace))
     }
-  }
 
-  def dump: String = {
+  def dump: String =
     (0 until 8)
       .map { row =>
         (0 until 8).map { col =>
@@ -106,7 +104,6 @@ case class Board(peaces: Map[Coordinate, PlayerPeace]) {
         }.mkString
       }
       .mkString("\n")
-  }
 }
 
 sealed trait Transformation
@@ -130,7 +127,7 @@ object Board {
   private def figures(
       row: Row,
       player: Player
-  ): Map[Coordinate, PlayerPeace] = {
+  ): Map[Coordinate, PlayerPeace] =
     Map(
       Coordinate(Column(0), row) -> Figure.Rook,
       Coordinate(Column(1), row) -> Figure.Knight,
@@ -141,7 +138,6 @@ object Board {
       Coordinate(Column(6), row) -> Figure.Knight,
       Coordinate(Column(7), row) -> Figure.Rook
     ).view.mapValues(f => PlayerPeace(f, player)).toMap
-  }
 }
 
 sealed trait Player {

@@ -1,6 +1,4 @@
 package pgnparser
-import cats.parse.{Parser => P, _}
-import cats.syntax.all._
 import utest._
 import com.softwaremill.diffx.ConsoleColorConfig
 import com.softwaremill.diffx.utest.DiffxAssertions._

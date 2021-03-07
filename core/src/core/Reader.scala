@@ -24,7 +24,7 @@ case class ChessGame(
 
   private def lanMoveToMove(lan: LanMove): List[Transformation] =
     lan match {
-      case LanMove.FigureMove(figure, destitnation, check, source, _) =>
+      case LanMove.FigureMove(figure, destitnation, _, source, _) =>
         List(
           Transformation.Move(
             source.toCoord(),
@@ -32,9 +32,9 @@ case class ChessGame(
             PlayerPeace(figure, currentPlayer)
           )
         )
-      case LanMove.PawnCapture(destitnation, source, check, promotion) =>
+      case LanMove.PawnCapture(destitnation, source, _, promotion) =>
         board.getSquare(destitnation.toCoord()) match {
-          case Some(v) =>
+          case Some(_) =>
             List(
               Transformation.Move(
                 source.toCoord(),
@@ -54,7 +54,7 @@ case class ChessGame(
               )
             )
         }
-      case LanMove.PawnMove(source, destitnation, check, promotion) =>
+      case LanMove.PawnMove(source, destitnation, _, promotion) =>
         List(
           Transformation.Move(
             source.toCoord(),
@@ -62,12 +62,12 @@ case class ChessGame(
             PlayerPeace(promotion.getOrElse(Peace.Pawn), currentPlayer)
           )
         )
-      case LanMove.QueenSideCastle(check) =>
+      case LanMove.QueenSideCastle(_) =>
         currentPlayer match {
           case Player.Black => queenSideCastle(Rank('8'))
           case Player.White => queenSideCastle(Rank('1'))
         }
-      case LanMove.KingSideCastle(check) =>
+      case LanMove.KingSideCastle(_) =>
         currentPlayer match {
           case Player.Black => kingSideCastle(Rank('8'))
           case Player.White => kingSideCastle(Rank('1'))

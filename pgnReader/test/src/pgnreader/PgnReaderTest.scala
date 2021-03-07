@@ -11,6 +11,7 @@ object PgnReaderTest extends TestSuite {
   val tests = Tests {
 
     "should handle en passant" - {
+      // "move PawnCapture(Position(e,6),d,NoCheck,None)"
       val input = """-nb--rk-
                     |r-----bp
                     |p--p--p-
@@ -38,6 +39,39 @@ object PgnReaderTest extends TestSuite {
                       |-P-B-N--
                       |P-Q--PPP
                       |---RR-K-""".stripMargin
+      assert(boardAfter == expected)
+    }
+
+    "figures shouldn't jump over each other" - {
+      val input = """------k-
+                    |------pp
+                    |--p-----
+                    |--------
+                    |-----B--
+                    |------PK
+                    |--q----P
+                    |-q------""".stripMargin
+      val board = parseBoard(input)
+      val gameAfter = new PgnReader().applyMove(
+        ChessGame(board, Player.Black, None),
+        SanMove.FigureMove(
+          Figure.Queen,
+          Position(File('f'), Rank('5')),
+          Check.NoCheck,
+          None,
+          None,
+          isCapture = false
+        )
+      )
+      val boardAfter = gameAfter.unwrap().board.dump
+      val expected = """------k-
+                      |------pp
+                      |--p-----
+                      |-----q--
+                      |-----B--
+                      |------PK
+                      |-------P
+                      |-q------""".stripMargin
       assert(boardAfter == expected)
     }
 

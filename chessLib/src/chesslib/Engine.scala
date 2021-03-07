@@ -12,7 +12,8 @@ object Engine {
       figure: Figure,
       currentPlayer: Player
   ): Boolean = {
-    val figureRule = isEligibleToMove2(from, to, board, figure, currentPlayer)
+    val figureRule =
+      isEligibleToMoveFigureRule(from, to, board, figure, currentPlayer)
     if (figureRule) {
       val afterMove =
         board.move(
@@ -81,7 +82,7 @@ object Engine {
     !isSquareCheckedBy(kingLocation, board, currentPlayer.opponent)
   }
 
-  private def isEligibleToMove2(
+  private def isEligibleToMoveFigureRule(
       from: Coordinate,
       to: Coordinate,
       board: Board,
@@ -136,7 +137,6 @@ object Engine {
       val squaresBetween = LazyList
         .unfold(from)(s => s.shift(dir.shift).map(c => c -> c))
         .takeWhile(c => c != to)
-        .drop(1)
       noFiguresAt(squaresBetween, board)
     } else {
       false

@@ -78,16 +78,11 @@ class PgnReader extends Reader {
     )
   }
 
-  private def findPawnMoveSource( //Move to engine
+  private def findPawnMoveSource(
       board: Board,
       dest: Coordinate,
       currentPlayer: Player
   ): Coordinate = {
-    println(
-      board.peaces.filter(p =>
-        p._2.player == Player.White && p._2.peace == Peace.Pawn
-      )
-    )
     board.peaces
       .collect { case (c, PlayerPeace(Peace.Pawn, `currentPlayer`)) => c }
       .find(src => Engine.isPawnEligibleToMove(src, dest, board, currentPlayer))

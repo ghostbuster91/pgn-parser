@@ -1,9 +1,12 @@
 import mill._, scalalib._
+import mill.scalalib.publish._
 import mill.scalalib.scalafmt.ScalafmtModule
 import $ivy.`io.github.davidgregory084::mill-tpolecat:0.2.0`
 import io.github.davidgregory084.TpolecatModule
 import $ivy.`com.goyeau::mill-scalafix:0.2.1`
 import com.goyeau.mill.scalafix.ScalafixModule
+import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version_mill0.9:0.1.1`
+import de.tobiasroeser.mill.vcs.version.VcsVersion
 
 object pgnParser extends ChessModule {
   def moduleDeps = Seq(chessModel)
@@ -33,8 +36,28 @@ object pgnReader extends ChessModule {
   object test extends Tests with CommonTestModule
 }
 
-trait ChessModule extends BaseModule {
+trait ChessModule extends BaseModule with ChessPublishModule {
   def scalaVersion = "2.13.3"
+}
+
+trait ChessPublishModule extends PublishModule {
+  def publishVersion = VcsVersion.vcsState().format()
+  def pomSettings = PomSettings(
+    description = artifactName(),
+    organization = Settings.pomOrg,
+    url = Settings.projectUrl,
+    licenses = Seq(License.`Apache-2.0`),
+    versionControl =
+      VersionControl.github(Settings.githubOrg, Settings.githubRepo),
+    developers = Seq(
+      Developer(
+        "ghostbuster91",
+        "Kasper Kondzielski",
+        "https://github.com/ghostbuster91"
+      )
+    )
+  )
+
 }
 
 trait CommonTestModule extends BaseModule with TestModule {
@@ -56,4 +79,11 @@ trait BaseModule
       "-Ymacro-annotations"
     )
   }
+}
+
+object Settings {
+  val pomOrg = "io.ghostbuster91"
+  val githubOrg = "ghostbuster91"
+  val githubRepo = "pgn-parser"
+  val projectUrl = s"https://github.com/$githubOrg/$githubRepo"
 }

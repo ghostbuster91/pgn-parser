@@ -1,7 +1,7 @@
 package chessmodel
 
 import enumeratum._
-import scala.collection.immutable
+import chessmodel.coordinate._
 
 //TODO try changing to abstract class with constructor args
 sealed trait Direction extends EnumEntry {
@@ -9,11 +9,11 @@ sealed trait Direction extends EnumEntry {
   def opposite: Direction
 }
 
-sealed trait Diagonal extends Direction
-sealed trait File extends Direction
-sealed trait Rank extends Direction
-
 object Direction extends Enum[Direction] {
+
+  sealed trait Diagonal extends Direction
+  sealed trait File extends Direction
+  sealed trait Rank extends Direction
 
   case object NorthWest extends Diagonal {
     def shift: Shift = Shift(1, -1)

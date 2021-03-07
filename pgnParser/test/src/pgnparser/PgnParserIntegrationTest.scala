@@ -21,7 +21,8 @@ object PgnParserIntegrationTest extends TestSuite {
   }
 
   private def loadGames = {
-    val source = io.Source.fromResource("lichess_db_10k_lines_stripped_2020-12.pgn")
+    val source =
+      scala.io.Source.fromResource("lichess_db_10k_lines_stripped_2020-12.pgn")
     try source.getLines().toList
     finally source.close()
   }

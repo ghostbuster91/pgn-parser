@@ -49,11 +49,11 @@ object PgnParser {
     })
     .backtrack
     .orElse1((position ~ position).map { case (p1, p2) =>
-      SourceDest(Some(p1.column), Some(p1.row), p2)
+      SourceDest(Some(p1.file), Some(p1.rank), p2)
     })
 
   val source = position.backtrack
-    .map(p => Source(Some(p.column), Some(p.row)))
+    .map(p => Source(Some(p.file), Some(p.rank)))
     .orElse1(column.map(c => Source(Some(c), None)))
     .orElse1(row.map(r => Source(None, Some(r))))
 

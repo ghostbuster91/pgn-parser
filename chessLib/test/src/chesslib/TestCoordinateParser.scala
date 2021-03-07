@@ -1,7 +1,7 @@
 package chesslib
 
 import chessmodel.Board
-import chessmodel.Coordinate
+import chessmodel.coordinate._
 import chessmodel.PlayerPeace
 import chessmodel.Figure
 import chessmodel.Peace
@@ -12,7 +12,7 @@ object TestCoordinateParser {
     val rows = expectations.split('\n').zipWithIndex
     val expectationMatrix = rows.flatMap { case (textRow, rowId) =>
       textRow.zipWithIndex.map { case (square, colId) =>
-        Coordinate(7 - rowId, colId) -> (square == 'X')
+        Coordinate(Rank(7 - rowId), File(colId)) -> (square == 'X')
       }
     }.toMap
     expectationMatrix
@@ -22,7 +22,7 @@ object TestCoordinateParser {
     val board = rows
       .flatMap { case (textRow, rowId) =>
         textRow.zipWithIndex.map { case (square, colId) =>
-          Coordinate(7 - rowId, colId) -> (square match {
+          Coordinate(Rank(7 - rowId), File(colId)) -> (square match {
             case 'Q' => Some(PlayerPeace(Figure.Queen, Player.White))
             case 'K' => Some(PlayerPeace(Figure.King, Player.White))
             case 'B' => Some(PlayerPeace(Figure.Bishop, Player.White))

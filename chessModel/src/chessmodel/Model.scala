@@ -1,5 +1,7 @@
 package chessmodel
 
+import chessmodel.coordinate._
+
 sealed trait Peace
 object Peace {
   case object Pawn extends Peace
@@ -23,19 +25,6 @@ object Check {
 }
 
 case class PlayerPeace(peace: Peace, player: Player)
-case class Shift(rowInc: Int, colInc: Int)
-case class Coordinate(row: Int, col: Int) {
-  def shift(s: Shift): Option[Coordinate] = {
-    val nextSquare = copy(row = row + s.rowInc, col = col + s.colInc)
-    val isValidRow = nextSquare.row < 8 || nextSquare.row >= 0
-    val isValidCol = nextSquare.col < 8 || nextSquare.col >= 0
-    if (isValidRow && isValidCol) {
-      Some(nextSquare)
-    } else {
-      None
-    }
-  }
-}
 
 case class Board(peaces: Map[Coordinate, PlayerPeace]) {
   def getSquare(coords: Coordinate): Option[PlayerPeace] = peaces.get(coords)
@@ -59,7 +48,9 @@ object Board {
   val Starting: Board = Board(Whites ++ Blacks)
 
   private def pawns(row: Int, player: Player) = (0 until 8)
-    .map(col => Coordinate(row, col) -> PlayerPeace(Peace.Pawn, player))
+    .map(col =>
+      Coordinate(Rank(row), File(col)) -> PlayerPeace(Peace.Pawn, player)
+    )
     .toMap
 
   private def figures(
@@ -67,14 +58,14 @@ object Board {
       player: Player
   ): Map[Coordinate, PlayerPeace] = {
     Map(
-      Coordinate(row, 0) -> Figure.Rook,
-      Coordinate(row, 1) -> Figure.Knight,
-      Coordinate(row, 2) -> Figure.Bishop,
-      Coordinate(row, 3) -> Figure.Queen,
-      Coordinate(row, 4) -> Figure.King,
-      Coordinate(row, 5) -> Figure.Bishop,
-      Coordinate(row, 6) -> Figure.Knight,
-      Coordinate(row, 7) -> Figure.Rook
+      Coordinate(Rank(row), File(0)) -> Figure.Rook,
+      Coordinate(Rank(row), File(1)) -> Figure.Knight,
+      Coordinate(Rank(row), File(2)) -> Figure.Bishop,
+      Coordinate(Rank(row), File(3)) -> Figure.Queen,
+      Coordinate(Rank(row), File(4)) -> Figure.King,
+      Coordinate(Rank(row), File(5)) -> Figure.Bishop,
+      Coordinate(Rank(row), File(6)) -> Figure.Knight,
+      Coordinate(Rank(row), File(7)) -> Figure.Rook
     ).view.mapValues(f => PlayerPeace(f, player)).toMap
   }
 }
@@ -91,9 +82,9 @@ object Player {
   }
 }
 
-case class Position(column: Char, row: Char) {
+case class Position(file: Char, rank: Char) {
   def toCoord(): Coordinate = {
-    val col = this.column match {
+    val col = File(this.file match {
       case 'a' => 0
       case 'b' => 1
       case 'c' => 2
@@ -102,8 +93,8 @@ case class Position(column: Char, row: Char) {
       case 'f' => 5
       case 'g' => 6
       case 'h' => 7
-    }
-    val row = this.row match {
+    })
+    val row = Rank(this.rank match {
       case '1' => 0
       case '2' => 1
       case '3' => 2
@@ -112,7 +103,7 @@ case class Position(column: Char, row: Char) {
       case '6' => 5
       case '7' => 6
       case '8' => 7
-    }
+    })
     Coordinate(row, col)
   }
 }

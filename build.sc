@@ -1,5 +1,7 @@
 import mill._, scalalib._
 import mill.scalalib.scalafmt.ScalafmtModule
+import $ivy.`io.github.davidgregory084::mill-tpolecat:0.2.0`
+import io.github.davidgregory084.TpolecatModule
 
 object pgnParser extends ScalaModule with ScalafmtModule {
   def moduleDeps = Seq(chessModel)
@@ -28,9 +30,16 @@ object chessLib extends ScalaModule with ScalafmtModule {
   }
 }
 
-object chessModel extends ScalaModule with ScalafmtModule {
+object chessModel extends ScalaModule with ScalafmtModule with TpolecatModule {
   def scalaVersion = "2.13.5"
-  def ivyDeps = Agg(ivy"com.beachape::enumeratum::1.6.1")
+  def ivyDeps =
+    Agg(ivy"com.beachape::enumeratum::1.6.1", ivy"io.estatico::newtype::0.4.4")
+  def scalacOptions = T {
+    super.scalacOptions().filterNot(Set("-Xfatal-warnings")) ++ Seq(
+      "-Ymacro-annotations"
+    )
+  }
+
 }
 
 object core extends ScalaModule with ScalafmtModule {

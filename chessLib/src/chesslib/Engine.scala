@@ -183,13 +183,13 @@ object Engine {
       val squares = ((Math.min(from.row.v, to.row.v) + 1) until Math.max(
         from.row.v,
         to.row.v
-      )).map(row => Coordinate(Rank(row), from.col))
+      )).map(row => Coordinate(Column(row), from.col))
       noFiguresAt(squares, board)
     } else if (from.row == to.row) {
       val squares = ((Math.min(from.col.v, to.col.v) + 1) until Math.max(
         from.col.v,
         to.col.v
-      )).map(col => Coordinate(from.row, File(col)))
+      )).map(col => Coordinate(from.row, Row(col)))
       noFiguresAt(squares, board)
     } else {
       false

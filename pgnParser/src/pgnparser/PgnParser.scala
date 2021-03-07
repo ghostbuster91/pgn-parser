@@ -3,6 +3,7 @@ package pgnparser
 import cats.parse.{Parser => P, Parser1 => P1, _}
 import cats.syntax.all._
 import chessmodel._
+import chessmodel.position._
 
 object PgnParser {
   val whitespace = P.charIn(" \t\n")

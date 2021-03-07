@@ -3,7 +3,8 @@ package chesslib
 import utest._
 import chessmodel._
 import TestCoordinateParser._
-import utest.ufansi.Str
+import chessmodel.position._
+
 object ThreatDetectorTest extends TestSuite {
 
   val tests = Tests {

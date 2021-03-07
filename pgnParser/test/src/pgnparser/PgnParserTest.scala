@@ -6,6 +6,7 @@ import com.softwaremill.diffx.ConsoleColorConfig
 import com.softwaremill.diffx.utest.DiffxAssertions._
 import PgnParser._
 import chessmodel._
+import chessmodel.position._
 
 object PgnParserTest extends TestSuite with DiffSemiSupport {
   implicit val c: ConsoleColorConfig =

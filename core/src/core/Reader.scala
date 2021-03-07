@@ -1,6 +1,7 @@
 package core
 
 import chessmodel._
+import chessmodel.position._
 
 trait Reader {
   def read(game: String): Either[ParsingException, ChessGame]

@@ -5,6 +5,7 @@ import cats.parse.Parser.Expectation
 import com.softwaremill.diffx._
 import com.softwaremill.diffx.cats._
 import chessmodel._
+import chessmodel.position._
 
 trait DiffSemiSupport {
   implicit val dPos = Diff.derived[Position]

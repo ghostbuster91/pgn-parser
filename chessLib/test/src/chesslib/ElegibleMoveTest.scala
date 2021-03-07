@@ -2,6 +2,7 @@ package chesslib
 
 import utest._
 import chessmodel._
+import chessmodel.position._
 
 object ElegibleMoveTest extends TestSuite {
   val tests = Tests {

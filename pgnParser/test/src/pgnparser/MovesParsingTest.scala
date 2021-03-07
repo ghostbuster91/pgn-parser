@@ -8,6 +8,7 @@ import cats.parse.Parser.Expectation
 import com.softwaremill.diffx._
 import com.softwaremill.diffx.cats._
 import chessmodel._
+import chessmodel.position._
 
 object MovesParsingTest extends TestSuite with DiffSemiSupport {
 

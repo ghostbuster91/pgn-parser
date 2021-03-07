@@ -12,6 +12,7 @@ import scala.collection.immutable
 import chessmodel.Player.Black
 import chessmodel.Player.White
 import chessmodel.coordinate._
+import chessmodel.position._
 
 class PgnReader extends Reader {
   def read(pgnString: String): Either[ParsingException, ChessGame] = {

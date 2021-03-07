@@ -5,7 +5,7 @@ import chessmodel.coordinate._
 
 package object position {
   @newtype case class File(v: Char) {
-    def toColumn: Column = { //TODO create proper type for column
+    def toColumn: Column = {
       Column(v match {
         case 'a' => 0
         case 'b' => 1

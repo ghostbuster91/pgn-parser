@@ -33,7 +33,10 @@ object Engine {
       case Player.White => Direction.North
     }
     val isOneSquareFrom =
-      from.col == to.col && from.row == to.row - pawnDirection.shift.rowInc
+      from.col == to.col && from.row == to
+        .shift(pawnDirection.opposite.shift)
+        .get
+        .row
     val pawnRow = currentPlayer match {
       case Player.Black => 6
       case Player.White => 1

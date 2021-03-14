@@ -86,7 +86,7 @@ trait BaseModule
 }
 
 object Settings {
-  val pomOrg = "io.ghostbuster91"
+  val pomOrg = "io.github.ghostbuster91"
   val githubOrg = "ghostbuster91"
   val githubRepo = "pgn-parser"
   val projectUrl = s"https://github.com/$githubOrg/$githubRepo"

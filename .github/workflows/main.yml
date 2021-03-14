@@ -28,4 +28,4 @@ jobs:
 
       - name: Publish to Maven Central
         if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v'))
-        run: ./mill -i mill.scalalib.PublishModule/publishAll --publishArtifacts __.publishArtifacts --sonatypeCreds '${{ secrets.SONATYPE_CREDS }}' --gpgArgs "--batch,--yes,-a,-b" --release true
+        run: ./mill -i mill.scalalib.PublishModule/publishAll --publishArtifacts __.publishArtifacts --sonatypeCreds '${{ secrets.SONATYPE_CREDS }}' --sonatypeUri "https://s01.oss.sonatype.org/service/local" --gpgArgs "--batch,--yes,-a,-b" --release true

@@ -57,6 +57,10 @@ trait ChessPublishModule extends PublishModule {
       )
     )
   )
+  def sonatypeUri: String = "https://s01.oss.sonatype.org/service/local"
+
+  def sonatypeSnapshotUri: String =
+    "https://s01.oss.sonatype.org/content/repositories/snapshots"
 
 }
 

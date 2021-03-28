@@ -7,6 +7,8 @@ import $ivy.`com.goyeau::mill-scalafix:0.2.1`
 import com.goyeau.mill.scalafix.ScalafixModule
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version_mill0.9:0.1.1`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
+import $ivy.`com.lihaoyi::mill-contrib-tut:$MILL_VERSION`
+import contrib.tut._
 
 object pgnParser extends ChessModule {
   def moduleDeps = Seq(chessModel)
@@ -36,7 +38,15 @@ object pgnReader extends ChessModule {
   object test extends Tests with CommonTestModule
 }
 
-trait ChessModule extends BaseModule with ChessPublishModule {
+object docs extends TutModule {
+  def scalaVersion = "2.13.3"
+  def tutVersion = "0.6.13"
+  def moduleDeps = Seq(pgnReader)
+}
+
+trait ChessModule extends ChessInternalModule with ChessPublishModule
+
+trait ChessInternalModule extends BaseModule {
   def scalaVersion = "2.13.3"
 }
 

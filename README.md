@@ -82,3 +82,5 @@ case class ChessGame(
     previousState: Option[(ChessGame, LanMove)]
 )
 ```
+
+Reader does not verify game's correctness. The game is assumed to be valid.

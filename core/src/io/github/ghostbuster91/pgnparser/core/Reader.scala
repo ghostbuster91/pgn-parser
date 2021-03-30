@@ -29,7 +29,7 @@ case class ChessGame(
           Transformation.Move(
             source.toCoord(),
             destitnation.toCoord(),
-            PlayerPeace(figure, currentPlayer)
+            PlayerPiece(figure, currentPlayer)
           )
         )
       case LanMove.PawnCapture(destitnation, source, _, promotion) =>
@@ -39,7 +39,7 @@ case class ChessGame(
               Transformation.Move(
                 source.toCoord(),
                 destitnation.toCoord(),
-                PlayerPeace(promotion.getOrElse(Peace.Pawn), currentPlayer)
+                PlayerPiece(promotion.getOrElse(Piece.Pawn), currentPlayer)
               )
             )
           case None =>
@@ -47,7 +47,7 @@ case class ChessGame(
               Transformation.Move(
                 source.toCoord(),
                 destitnation.toCoord(),
-                PlayerPeace(promotion.getOrElse(Peace.Pawn), currentPlayer)
+                PlayerPiece(promotion.getOrElse(Piece.Pawn), currentPlayer)
               ),
               Transformation.Remove(
                 Coordinate(destitnation.toCoord().col, source.toCoord().row)
@@ -59,7 +59,7 @@ case class ChessGame(
           Transformation.Move(
             source.toCoord(),
             destitnation.toCoord(),
-            PlayerPeace(promotion.getOrElse(Peace.Pawn), currentPlayer)
+            PlayerPiece(promotion.getOrElse(Piece.Pawn), currentPlayer)
           )
         )
       case LanMove.QueenSideCastle(_) =>
@@ -79,12 +79,12 @@ case class ChessGame(
       Transformation.Move(
         Position(File('e'), row).toCoord(),
         Position(File('c'), row).toCoord(),
-        PlayerPeace(Figure.King, currentPlayer)
+        PlayerPiece(Figure.King, currentPlayer)
       ),
       Transformation.Move(
         Position(File('a'), row).toCoord(),
         Position(File('d'), row).toCoord(),
-        PlayerPeace(Figure.Rook, currentPlayer)
+        PlayerPiece(Figure.Rook, currentPlayer)
       )
     )
 
@@ -93,12 +93,12 @@ case class ChessGame(
       Transformation.Move(
         Position(File('e'), row).toCoord(),
         Position(File('g'), row).toCoord(),
-        PlayerPeace(Figure.King, currentPlayer)
+        PlayerPiece(Figure.King, currentPlayer)
       ),
       Transformation.Move(
         Position(File('h'), row).toCoord(),
         Position(File('f'), row).toCoord(),
-        PlayerPeace(Figure.Rook, currentPlayer)
+        PlayerPiece(Figure.Rook, currentPlayer)
       )
     )
 }

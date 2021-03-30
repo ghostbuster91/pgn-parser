@@ -95,8 +95,8 @@ class PgnReader extends Reader {
       dest: Coordinate,
       currentPlayer: Player
   ): Coordinate =
-    board.peaces
-      .collect { case (c, PlayerPeace(Peace.Pawn, `currentPlayer`)) => c }
+    board.pieces
+      .collect { case (c, PlayerPiece(Piece.Pawn, `currentPlayer`)) => c }
       .find(src => Engine.isPawnEligibleToMove(src, dest, board, currentPlayer))
       .getOrElse(
         throw new RuntimeException(
@@ -110,9 +110,9 @@ class PgnReader extends Reader {
       currentPlayer: Player,
       source: File
   ): Coordinate =
-    board.peaces
+    board.pieces
       .collect {
-        case (coord, PlayerPeace(Peace.Pawn, `currentPlayer`))
+        case (coord, PlayerPiece(Piece.Pawn, `currentPlayer`))
             if coord.col == source.toColumn =>
           coord
       }
@@ -147,19 +147,19 @@ class PgnReader extends Reader {
         )
       case (Some(srcCol), None) =>
         handleFigureMoveGeneric(game, sanMove) {
-          case (c, PlayerPeace(sanMove.figure, game.currentPlayer))
+          case (c, PlayerPiece(sanMove.figure, game.currentPlayer))
               if c.col == srcCol.toColumn =>
             c
         }
       case (None, Some(srcRow)) =>
         handleFigureMoveGeneric(game, sanMove) {
-          case (coord, PlayerPeace(sanMove.figure, game.currentPlayer))
+          case (coord, PlayerPiece(sanMove.figure, game.currentPlayer))
               if coord.row == srcRow.toRow =>
             coord
         }
       case (None, None) =>
         handleFigureMoveGeneric(game, sanMove) {
-          case (c, PlayerPeace(sanMove.figure, game.currentPlayer)) => c
+          case (c, PlayerPiece(sanMove.figure, game.currentPlayer)) => c
         }
     }
 
@@ -167,9 +167,9 @@ class PgnReader extends Reader {
       game: ChessGame,
       sanMove: SanMove.FigureMove
   )(
-      f: PartialFunction[(Coordinate, PlayerPeace), Coordinate]
+      f: PartialFunction[(Coordinate, PlayerPiece), Coordinate]
   ) = {
-    val candidates = game.board.peaces.toList.collect(f)
+    val candidates = game.board.pieces.toList.collect(f)
     handleFigureMoveCandidates(game, sanMove, candidates)
   }
 

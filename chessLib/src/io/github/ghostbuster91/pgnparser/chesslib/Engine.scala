@@ -17,7 +17,7 @@ object Engine {
     if (figureRule) {
       val afterMove =
         board.move(
-          Transformation.Move(from, to, PlayerPeace(figure, currentPlayer))
+          Transformation.Move(from, to, PlayerPiece(figure, currentPlayer))
         )
       isEligibleToMoveKingRule(afterMove, currentPlayer)
     } else {
@@ -69,8 +69,8 @@ object Engine {
       board: Board,
       currentPlayer: Player
   ): Boolean = {
-    val kingLocation = board.peaces
-      .collectFirst { case (coord, PlayerPeace(Figure.King, `currentPlayer`)) =>
+    val kingLocation = board.pieces
+      .collectFirst { case (coord, PlayerPiece(Figure.King, `currentPlayer`)) =>
         coord
       }
       .getOrElse(
@@ -208,7 +208,7 @@ object Engine {
     val possibleKnightPlaces = getPossibleKnightMoves(target)
     possibleKnightPlaces
       .flatMap(board.getSquare)
-      .exists(pp => pp.player == opponent && pp.peace == Figure.Knight)
+      .exists(pp => pp.player == opponent && pp.piece == Figure.Knight)
   }
 
   private def getPossibleKnightMoves(from: Coordinate): List[Coordinate] = {
@@ -230,11 +230,11 @@ object Engine {
       direction: Direction
   ): Boolean = {
     val friend = opponent.opponent
-    getFirstPeace(target, board, direction) match {
-      case Some((_, PlayerPeace(_, `friend`))) => false
-      case Some((distance, PlayerPeace(peace, opponent))) =>
-        peace match {
-          case Peace.Pawn =>
+    getFirstPiece(target, board, direction) match {
+      case Some((_, PlayerPiece(_, `friend`))) => false
+      case Some((distance, PlayerPiece(piece, opponent))) =>
+        piece match {
+          case Piece.Pawn =>
             distance == 1 && isPawnThreat(direction.opposite, opponent)
           case Figure.Bishop => isBishopThreat(direction.opposite)
           case Figure.Rook   => isRookThreat(direction.opposite)
@@ -277,12 +277,12 @@ object Engine {
 
   type Distance = Int
 
-  private def getFirstPeace(
+  private def getFirstPiece(
       coords: Coordinate,
       board: Board,
       direction: Direction,
       distance: Distance = 1
-  ): Option[(Distance, PlayerPeace)] =
+  ): Option[(Distance, PlayerPiece)] =
     if (distance <= 8) {
       coords
         .shift(direction.shift)
@@ -290,7 +290,7 @@ object Engine {
           board
             .getSquare(nextSquare)
             .map(p => distance -> p)
-            .orElse(getFirstPeace(nextSquare, board, direction, distance + 1))
+            .orElse(getFirstPiece(nextSquare, board, direction, distance + 1))
         )
     } else {
       Option.empty

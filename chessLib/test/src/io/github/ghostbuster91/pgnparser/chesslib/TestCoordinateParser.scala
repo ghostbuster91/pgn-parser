@@ -2,7 +2,7 @@ package io.github.ghostbuster91.pgnparser.chesslib
 
 import chessmodel.Board
 import chessmodel.coordinate._
-import chessmodel.PlayerPeace
+import chessmodel.PlayerPiece
 
 object TestCoordinateParser {
   def parseExp(expectations: String): Map[Coordinate, Boolean] = {
@@ -18,7 +18,7 @@ object TestCoordinateParser {
     val board = rows
       .flatMap { case (textRow, rowId) =>
         textRow.zipWithIndex.map { case (square, colId) =>
-          Coordinate(Column(colId), Row(7 - rowId)) -> (PlayerPeace.fromChar(
+          Coordinate(Column(colId), Row(7 - rowId)) -> (PlayerPiece.fromChar(
             square
           ))
         }

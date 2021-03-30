@@ -102,7 +102,7 @@ object PgnReaderTest extends TestSuite {
     val board = rows
       .flatMap { case (textRow, rowId) =>
         textRow.zipWithIndex.map { case (square, colId) =>
-          Coordinate(Column(colId), Row(7 - rowId)) -> (PlayerPeace.fromChar(
+          Coordinate(Column(colId), Row(7 - rowId)) -> (PlayerPiece.fromChar(
             square
           ))
         }

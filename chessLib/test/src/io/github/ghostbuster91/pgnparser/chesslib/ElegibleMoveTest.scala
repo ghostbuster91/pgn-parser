@@ -24,7 +24,7 @@ object ElegibleMoveTest extends TestSuite {
           |---X----
           |---X----
           |---X----"""
-      )(LocatedPeace(Position(File('d'), Rank('4')), Player.White))
+      )(LocatedPiece(Position(File('d'), Rank('4')), Player.White))
     }
 
     "pinned rook shouldn't be able to move" - {
@@ -45,14 +45,14 @@ object ElegibleMoveTest extends TestSuite {
           |--------
           |--------
           |--------"""
-      )(LocatedPeace(Position(File('g'), Rank('7')), Player.White))
+      )(LocatedPiece(Position(File('g'), Rank('7')), Player.White))
     }
   }
-  private def test(strBoard: String, strMatrix: String)(lp: LocatedPeace) = {
+  private def test(strBoard: String, strMatrix: String)(lp: LocatedPiece) = {
     val matrix = TestCoordinateParser.parseExp(strMatrix.stripMargin)
     val board = TestCoordinateParser.parseBoard(strBoard.stripMargin)
     matrix.foreach { case (coord, expected) =>
-      board.getSquare(lp.position.toCoord()).get.peace match {
+      board.getSquare(lp.position.toCoord()).get.piece match {
         case figure: Figure =>
           val result =
             Engine.isEligibleToMove(
@@ -66,9 +66,9 @@ object ElegibleMoveTest extends TestSuite {
             result == expected,
             s"${Position.fromCoord(coord)} expected: $expected"
           )
-        case Peace.Pawn => //TODO
+        case Piece.Pawn => //TODO
       }
     }
   }
-  case class LocatedPeace(position: Position, player: Player)
+  case class LocatedPiece(position: Position, player: Player)
 }

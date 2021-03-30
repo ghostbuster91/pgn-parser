@@ -61,15 +61,15 @@ res2: Either[io.github.ghostbuster91.pgnparser.core.ParsingException, io.github.
   ChessGame(
     Board(
       HashMap(
-        Coordinate(1, 0) -> PlayerPeace(Knight, White),
-        Coordinate(4, 3) -> PlayerPeace(Pawn, White),
-        Coordinate(4, 7) -> PlayerPeace(King, Black),
-        Coordinate(3, 7) -> PlayerPeace(Queen, Black),
-        Coordinate(7, 1) -> PlayerPeace(Pawn, White),
-        Coordinate(4, 0) -> PlayerPeace(King, White),
-        Coordinate(1, 1) -> PlayerPeace(Pawn, White),
-        Coordinate(0, 1) -> PlayerPeace(Pawn, White),
-        Coordinate(0, 0) -> PlayerPeace(Rook, White),
+        Coordinate(1, 0) -> PlayerPiece(Knight, White),
+        Coordinate(4, 3) -> PlayerPiece(Pawn, White),
+        Coordinate(4, 7) -> PlayerPiece(King, Black),
+        Coordinate(3, 7) -> PlayerPiece(Queen, Black),
+        Coordinate(7, 1) -> PlayerPiece(Pawn, White),
+        Coordinate(4, 0) -> PlayerPiece(King, White),
+        Coordinate(1, 1) -> PlayerPiece(Pawn, White),
+        Coordinate(0, 1) -> PlayerPiece(Pawn, White),
+        Coordinate(0, 0) -> PlayerPiece(Rook, White),
 ...
 ```
 

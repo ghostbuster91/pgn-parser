@@ -1,8 +1,8 @@
-package io.github.ghostbuster91.pgnparser.pgnreader
+package io.github.ghostbuster91.pgnparser.reader
 
 import io.github.ghostbuster91.pgnparser.core.Reader
 import io.github.ghostbuster91.pgnparser.core.LanMove
-import io.github.ghostbuster91.pgnparser.pgnparser._
+import io.github.ghostbuster91.pgnparser.parser._
 import io.github.ghostbuster91.pgnparser.core.ChessGame
 import io.github.ghostbuster91.pgnparser.core.ParsingException
 import cats.syntax.all._

@@ -1,4 +1,4 @@
-package io.github.ghostbuster91.pgnparser.pgnparser
+package io.github.ghostbuster91.pgnparser.parser
 
 import utest._
 

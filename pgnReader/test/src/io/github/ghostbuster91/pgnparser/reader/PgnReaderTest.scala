@@ -1,11 +1,11 @@
-package io.github.ghostbuster91.pgnparser.pgnreader
+package io.github.ghostbuster91.pgnparser.reader
 
 import utest._
 import chessmodel._
 import chessmodel.coordinate._
 import chessmodel.position._
 import io.github.ghostbuster91.pgnparser.core.ChessGame
-import io.github.ghostbuster91.pgnparser.pgnparser.SanMove
+import io.github.ghostbuster91.pgnparser.parser.SanMove
 
 object PgnReaderTest extends TestSuite {
   val tests = Tests {

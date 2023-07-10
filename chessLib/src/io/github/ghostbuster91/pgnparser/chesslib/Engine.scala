@@ -45,7 +45,7 @@ object Engine {
       case Player.White => 1
     }
     val pawnRowHop = pawnRow + 2 * pawnDirection.shift.rowInc
-    val nextSquare = from.shift(pawnDirection.shift).get //TODO
+    val nextSquare = from.shift(pawnDirection.shift).get // TODO
     val isJump = (from.col == to.col &&
       from.row == pawnRow &&
       to.row == pawnRowHop &&
@@ -197,7 +197,7 @@ object Engine {
     val rayCheck = Direction.values.toList.exists(d =>
       isSquareCheckedFromDirection(target, board, opponent, d)
     )
-    knightCheck || rayCheck //TODO lazy?
+    knightCheck || rayCheck // TODO lazy?
   }
 
   private def isSquareCheckedFromKnight(

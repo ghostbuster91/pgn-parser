@@ -60,7 +60,7 @@ object PgnParser {
     .orElse1(column.map(c => Source(Some(c), None)))
     .orElse1(row.map(r => Source(None, Some(r))))
 
-  //Nf3, Nbf3
+  // Nf3, Nbf3
   val figureMove = (figure ~ sourceDest ~ checkRule).map {
     case ((f, pos), check) =>
       SanMove.FigureMove(
@@ -86,7 +86,7 @@ object PgnParser {
           isCapture = true
         ): SanMove
     }
-  //cxd4
+  // cxd4
   val pawnCapture =
     ((column <* P.char('x')) ~ position ~ pawnPromo ~ checkRule)
       .map { case (((c, pos), f), check) =>

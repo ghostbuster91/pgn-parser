@@ -65,12 +65,15 @@ trait ChessPublishModule extends PublishModule {
 }
 
 trait CommonTestModule extends BaseModule with TestModule {
+
   def ivyDeps = Agg(
     ivy"com.lihaoyi::utest::0.7.7",
-    ivy"com.softwaremill.diffx::diffx-utest::0.4.4",
-    ivy"com.softwaremill.diffx::diffx-cats::0.4.4"
+    ivy"com.github.jatcwang::difflicious-munit:0.4.1",
+    ivy"com.github.jatcwang::difflicious-cats:0.4.1",
+    ivy"com.github.jatcwang::difflicious-scalatest:0.4.1"
   )
   def testFrameworks = Seq("utest.runner.Framework")
+
 }
 
 trait BaseModule

@@ -126,7 +126,7 @@ class PgnReader extends Reader {
       .getOrElse(
         throw new RuntimeException(
           s"Couldn't find a pawn to capture on ${Position
-            .fromCoord(dest)} by $currentPlayer from $source"
+              .fromCoord(dest)} by $currentPlayer from $source"
         )
       )
 

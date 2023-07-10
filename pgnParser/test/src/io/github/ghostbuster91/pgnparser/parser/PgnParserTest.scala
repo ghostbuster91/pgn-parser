@@ -1,20 +1,20 @@
 package io.github.ghostbuster91.pgnparser.parser
+
 import utest._
-// import com.softwaremill.diffx.ConsoleColorConfig
-import com.softwaremill.diffx.utest.DiffxAssertions._
 import PgnParser._
 import chessmodel._
 import chessmodel.position._
+import cats.parse.Parser
+import difflicious.Differ
+import difflicious.scalatest.ScalatestDiff._
 
 object PgnParserTest extends TestSuite with DiffSemiSupport {
-  // implicit val c: ConsoleColorConfig =
-  //   ConsoleColorConfig(x => s"-$x", x => s"+$x", identity, identity)
 
   val tests = Tests {
     "parse event property" - {
       val input = """[Event "Rated Blitz game"]"""
       val output = property.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String, Tag)]].assertNoDiff(
         output,
         Right("" -> Tag("Event", "Rated Blitz game"))
       )
@@ -22,7 +22,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - pawns moves only" - {
       val input = "1. e4 e6"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String, Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -43,7 +43,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - figure move" - {
       val input = "1. Nf3 e6"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String, Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -70,7 +70,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - figure ambigious move" - {
       val input = "1. Rac1 e6"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -97,7 +97,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - move with check" - {
       val input = "36. Ra6+ Kc5"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -127,7 +127,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - move with checkmate" - {
       val input = "36. Ra6 Kc5#"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -157,7 +157,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - single move" - {
       val input = "36. Ra6"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -178,7 +178,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - move with capture" - {
       val input = "19. Bxf3"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -199,7 +199,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - move with capture by pawn" - {
       val input = "19. cxf3"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -218,7 +218,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - promotion move" - {
       val input = "19. a1=Q"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -236,7 +236,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - capture and check" - {
       val input = "9. Bxc6+"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -257,7 +257,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - promotion move with check" - {
       val input = "19. a1=Q+"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -275,7 +275,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - king side castling" - {
       val input = "19. O-O"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -291,7 +291,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - king side castling with check" - {
       val input = "19. O-O+"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -307,7 +307,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - queen side castling" - {
       val input = "19. O-O-O"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -323,7 +323,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - queen side castling with checkmate" - {
       val input = "19. O-O-O#"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -339,7 +339,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - promotion move with capture" - {
       val input = "19. axb8=Q"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -358,7 +358,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round - promotion move with capture and checkmate" - {
       val input = "19. axb8=Q#"
       val output = round.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,Round)]].assertNoDiff(
         output,
         Right(
           "" -> Round(
@@ -375,14 +375,14 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
       )
     }
     "parse score" - {
-      assertEqual(score.parse("1-0"), Right("" -> GameResult.WhiteWins))
-      assertEqual(score.parse("0-1"), Right("" -> GameResult.BlackWins))
-      assertEqual(score.parse("1/2-1/2"), Right("" -> GameResult.Draw))
+      Differ[Either[Parser.Error, (String,GameResult)]].assertNoDiff(score.parse("1-0"), Right("" -> GameResult.WhiteWins))
+      Differ[Either[Parser.Error, (String,GameResult)]].assertNoDiff(score.parse("0-1"), Right("" -> GameResult.BlackWins))
+      Differ[Either[Parser.Error, (String,GameResult)]].assertNoDiff(score.parse("1/2-1/2"), Right("" -> GameResult.Draw))
     }
     "parse multiple rounds" - {
       val input = "1. d4 d5 2. f4 e6 3. Nf4 g6 "
       val output = rounds.parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,List[Round])]].assertNoDiff(
         output,
         Right(
           "" -> List(
@@ -441,7 +441,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse rounds ended with score" - {
       val input = "1. d4 d5 1/2-1/2"
       val output = (rounds ~ score).parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,(List[Round],GameResult))]].assertNoDiff(
         output,
         Right(
           "" -> (List(
@@ -467,7 +467,7 @@ object PgnParserTest extends TestSuite with DiffSemiSupport {
     "parse round with single move followed by score" - {
       val input = """12. d4 0-1"""
       val output = (rounds ~ score).parse(input)
-      assertEqual(
+      Differ[Either[Parser.Error, (String,(List[Round],GameResult))]].assertNoDiff(
         output,
         Right(
           "" -> (List(

@@ -65,18 +65,15 @@ trait ChessPublishModule extends PublishModule {
 }
 
 trait CommonTestModule extends BaseModule with TestModule {
-  import coursier.LocalRepositories
+
   def ivyDeps = Agg(
     ivy"com.lihaoyi::utest::0.7.7",
-    ivy"com.softwaremill.diffx::diffx-utest::0.8.3",
-    ivy"com.softwaremill.diffx::diffx-cats::0.8.3",
-    ivy"com.github.jatcwang::difflicious-munit:0.4.1+11-b66faea6-SNAPSHOT",
-    ivy"com.github.jatcwang::difflicious-scalatest:0.4.1+11-b66faea6-SNAPSHOT"
+    ivy"com.github.jatcwang::difflicious-munit:0.4.1",
+    ivy"com.github.jatcwang::difflicious-cats:0.4.1",
+    ivy"com.github.jatcwang::difflicious-scalatest:0.4.1"
   )
   def testFrameworks = Seq("utest.runner.Framework")
 
-  override def repositories =
-    super.repositories ++ Seq(LocalRepositories.ivy2Local)
 }
 
 trait BaseModule
